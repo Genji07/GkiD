@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#FF8C42">
+<meta name="description" content="GkiD — Game pendidikan untuk kanak-kanak 1–6 tahun. Selamat, tiada iklan, tiada IAP.">
+<title>GkiD — Belajar Sambil Bermain</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="GkiD">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!--
+  GkiD v1.0 — PROTOTAIP AWAL + PWA
+  Bukan penilaian undang-undang. Perlu semakan pakar sebelum terbit.
+  Tiada iklan, tiada IAP, tiada sembang, tiada pengumpulan data peribadi.
+  Semua data (bintang, tetapan) disimpan dalam localStorage peranti.
+-->
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#FFF8E7;--primary:#FF8C42;--secondary:#4ECDC4;--accent:#FFE66D;--text:#2C3E50;--danger:#E74C3C;--ok:#27AE60}
+html,body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);height:100%;overflow:hidden;user-select:none;-webkit-user-select:none}
+#app{height:100dvh;display:flex;flex-direction:column}
+.screen{display:none;flex:1;padding:24px 20px;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow-y:auto}
+.screen.active{display:flex}
+h1{font-size:clamp(36px,10vw,64px);color:var(--primary);margin-bottom:12px;font-weight:900;letter-spacing:-1px}
+h2{font-size:clamp(22px,6vw,36px);margin-bottom:16px;font-weight:800}
+p{font-size:clamp(16px,4vw,22px);line-height:1.5;margin-bottom:12px;max-width:600px}
+.btn{background:var(--primary);color:#fff;border:none;border-radius:24px;padding:20px 36px;font-size:clamp(18px,5vw,26px);font-weight:800;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.18);transition:transform .1s,box-shadow .1s;min-height:88px;min-width:88px;font-family:inherit;margin:8px}
+.btn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn.secondary{background:var(--secondary)}
+.btn.small{min-height:56px;font-size:clamp(14px,3.5vw,18px);padding:12px 24px;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.grid{display:grid;gap:16px;width:100%;max-width:600px}
+.grid.g2{grid-template-columns:repeat(2,1fr)}
+.grid.g3{grid-template-columns:repeat(3,1fr)}
+.card{background:#fff;border-radius:24px;padding:20px;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.08);transition:transform .15s;border:4px solid transparent;font-size:clamp(40px,12vw,64px);line-height:1.2}
+.card:active{transform:scale(.95)}
+.card.correct{border-color:var(--ok);animation:pop .4s}
+.card.wrong{border-color:var(--danger);animation:shake .4s}
+.card .label{font-size:clamp(12px,3vw,16px);margin-top:6px;font-weight:700;color:#555}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.anim-off *{animation:none!important;transition:none!important}
+.top-bar{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;z-index:10}
+.icon-btn{background:rgba(255,255,255,.95);border:none;border-radius:50%;width:60px;height:60px;font-size:26px;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center}
+.stars{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.95);padding:8px 22px;border-radius:100px;font-size:20px;font-weight:900;color:#F39C12;box-shadow:0 3px 10px rgba(0,0,0,.1);z-index:9}
+.big-emoji{font-size:clamp(90px,25vw,160px);line-height:1;margin:12px 0}
+.age-picker{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:20px 0;max-width:600px}
+.age-picker button{background:#fff;border:4px solid var(--primary);border-radius:20px;padding:20px 24px;font-size:clamp(16px,4vw,20px);font-weight:800;color:var(--text);cursor:pointer;font-family:inherit;min-height:88px;min-width:120px}
+.age-picker button.selected{background:var(--primary);color:#fff}
+#screen-activity{justify-content:flex-start;padding-top:90px}
+.letter-slots{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:20px 0}
+.slot{width:56px;height:64px;background:#fff;border:4px dashed #ccc;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:var(--primary)}
+.slot.filled{border-style:solid;border-color:var(--secondary)}
+.letters{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.letter-btn{width:64px;height:64px;background:var(--accent);border:none;border-radius:16px;font-size:30px;font-weight:900;color:var(--text);cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.15);font-family:inherit}
+.letter-btn:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.letter-btn.used{opacity:.3;pointer-events:none}
+.reward-overlay{position:fixed;inset:0;background:rgba(255,248,231,.97);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:100;padding:20px}
+.reward-overlay.show{display:flex}
+.reward-emoji{font-size:clamp(100px,30vw,180px);animation:pop .6s}
+.setting-row{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:420px;padding:16px;background:#fff;border-radius:16px;margin:8px 0;font-size:clamp(15px,3.8vw,18px);font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.switch{position:relative;width:60px;height:34px;background:#ccc;border-radius:100px;transition:background .2s;cursor:pointer;flex-shrink:0}
+.switch.on{background:var(--secondary)}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:28px;height:28px;background:#fff;border-radius:50%;transition:transform .2s}
+.switch.on::after{transform:translateX(26px)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="stars" id="starCounter" style="display:block">⭐ 0</div>
+
+  <div class="reward-overlay" id="rewardOverlay" role="dialog" aria-live="polite">
+    <div class="reward-emoji" id="rewardEmoji">🌟</div>
+    <h2 id="rewardText">Hebat!</h2>
+    <button class="btn" onclick="closeReward()">Teruskan</button>
+  </div>
+
+  <div class="screen active" id="screen-home">
+    <h1>🎨 GkiD</h1>
+    <p>Belajar sambil bermain</p>
+    <div class="big-emoji">🧒🎈🌈</div>
+    <button class="btn" onclick="goTo('age')">Mula Main</button>
+    <button class="btn secondary small" onclick="openParentGate()">👨‍👩‍👧 Ibu Bapa</button>
+  </div>
+
+  <div class="screen" id="screen-age">
+    <h2>Pilih Umur Anak</h2>
+    <p style="font-size:16px;color:#7f8c8d">Untuk sesuaikan aktiviti</p>
+    <div class="age-picker" id="agePicker"></div>
+    <button class="btn secondary small" onclick="goTo('home')">Kembali</button>
+  </div>
+
+  <div class="screen" id="screen-world">
+    <h2>Pilih Dunia</h2>
+    <div class="grid g2" id="worldGrid"></div>
+    <button class="btn secondary small" onclick="goTo('age')">Tukar Umur</button>
+  </div>
+
+  <div class="screen" id="screen-activity">
+    <div class="top-bar">
+      <button class="icon-btn" onclick="exitActivity()" aria-label="Kembali">⬅️</button>
+      <button class="icon-btn" onclick="replayInstruction()" aria-label="Ulang arahan">🔊</button>
+    </div>
+    <div id="activityContent" style="width:100%;max-width:600px"></div>
+  </div>
+
+  <div class="screen" id="screen-parentLock">
+    <h2>🔒 Kawalan Ibu Bapa</h2>
+    <p>Sila jawab:</p>
+    <p style="font-size:clamp(30px,8vw,44px);font-weight:900;color:var(--primary)" id="lockQuestion"></p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center" id="lockChoices"></div>
+    <button class="btn secondary small" onclick="goTo('home')" style="margin-top:20px">Batal</button>
+  </div>
+
+  <div class="screen" id="screen-parent">
+    <h2>👨‍👩‍👧 Mod Ibu Bapa</h2>
+    <div id="parentPanel" style="width:100%;max-width:480px"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+const state = {
+  age: null,
+  stars: parseInt(localStorage.getItem('gkid_stars')||'0',10),
+  soundOn: localStorage.getItem('gkid_sound')!=='off',
+  animOn: localStorage.getItem('gkid_anim')!=='off',
+  starsPerSession: 0,
+  currentActivity: null,
+  activityData: null
+};
+const AGES = [
+  {label:'1–2 tahun', world:'sensory'},
+  {label:'2–3 tahun', world:'match'},
+  {label:'3–4 tahun', world:'count'},
+  {label:'4–5 tahun', world:'compare'},
+  {label:'5–6 tahun', world:'word'}
+];
+const WORLDS = {
+  sensory:{emoji:'🐾',name:'Sentuh & Dengar'},
+  match:{emoji:'🎨',name:'Cari Warna'},
+  count:{emoji:'🔢',name:'Kira Haiwan'},
+  compare:{emoji:'⚖️',name:'Mana Lebih?'},
+  word:{emoji:'📝',name:'Bina Perkataan'}
+};
+const ANIMALS = [
+  {emoji:'🐱',name:'Kucing',sound:'Meow'},
+  {emoji:'🐶',name:'Anjing',sound:'Woof'},
+  {emoji:'🐮',name:'Lembu',sound:'Moo'},
+  {emoji:'🐸',name:'Katak',sound:'Croak'},
+  {emoji:'🦆',name:'Itik',sound:'Quack'},
+  {emoji:'🐔',name:'Ayam',sound:'Cluck'}
+];
+const COLORS = [
+  {name:'Merah',hex:'#E74C3C'},{name:'Biru',hex:'#3498DB'},
+  {name:'Kuning',hex:'#F1C40F'},{name:'Hijau',hex:'#27AE60'},
+  {name:'Ungu',hex:'#9B59B6'},{name:'Oren',hex:'#E67E22'}
+];
+const WORDS = [
+  {word:'BOLA',emoji:'⚽'},{word:'BUKU',emoji:'📕'},
+  {word:'AYAM',emoji:'🐔'},{word:'BUNGA',emoji:'🌸'}
+];
+
+document.addEventListener('DOMContentLoaded',()=>{
+  if(!state.animOn) document.body.classList.add('anim-off');
+  updateStars();
+  buildAgePicker();
+  if(window.speechSynthesis) speechSynthesis.getVoices();
+});
+if(window.speechSynthesis) speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+
+function speak(text,cb){
+  if(!state.soundOn||!window.speechSynthesis){cb&&cb();return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='ms-MY';u.rate=.8;u.pitch=1.15;
+  const v=speechSynthesis.getVoices().find(x=>x.lang&&x.lang.toLowerCase().startsWith('ms'));
+  if(v)u.voice=v;
+  if(cb)u.onend=cb;
+  speechSynthesis.speak(u);
+}
+function stopSpeak(){if(window.speechSynthesis)speechSynthesis.cancel();}
+
+function goTo(id){
+  stopSpeak();
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.getElementById('starCounter').style.display=(id==='home')?'block':'none';
+}
+
+function updateStars(){
+  document.getElementById('starCounter').textContent='⭐ '+state.stars;
+  localStorage.setItem('gkid_stars',state.stars);
+}
+function addStar(){state.stars++;state.starsPerSession++;updateStars();}
+
+let rewardCallback=null;
+function showReward(emoji,text,cb){
+  document.getElementById('rewardEmoji').textContent=emoji||'🌟';
+  document.getElementById('rewardText').textContent=text||'Hebat!';
+  document.getElementById('rewardOverlay').classList.add('show');
+  speak(text||'Hebat! Syabas!');
+  addStar();
+  rewardCallback=cb||null;
+}
+function closeReward(){
+  stopSpeak();
+  document.getElementById('rewardOverlay').classList.remove('show');
+  const cb=rewardCallback;rewardCallback=null;
+  if(cb)cb();
+}
+
+function buildAgePicker(){
+  const p=document.getElementById('agePicker');p.innerHTML='';
+  AGES.forEach((a,i)=>{
+    const b=document.createElement('button');
+    b.textContent=a.label;
+    b.setAttribute('aria-label','Umur '+a.label);
+    b.onclick=()=>{
+      state.age=i;
+      document.querySelectorAll('#agePicker button').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      speak('Umur '+a.label);
+      setTimeout(()=>{buildWorlds();goTo('world');},600);
+    };
+    p.appendChild(b);
+  });
+}
+
+function buildWorlds(){
+  const g=document.getElementById('worldGrid');g.innerHTML='';
+  const rec=state.age!=null?AGES[state.age].world:null;
+  Object.entries(WORLDS).forEach(([k,w])=>{
+    const c=document.createElement('div');
+    c.className='card';
+    c.innerHTML=`<div style="font-size:clamp(36px,10vw,52px)">${w.emoji}</div><div class="label">${w.name}</div>`;
+    if(k===rec){c.style.border='4px solid var(--secondary)';}
+    c.onclick=()=>startActivity(k);
+    g.appendChild(c);
+  });
+}
+
+function startActivity(key){
+  state.currentActivity=key;
+  goTo('activity');
+  const map={sensory:runSensory,match:runMatch,count:runCount,compare:runCompare,word:runWord};
+  (map[key]||runSensory)();
+}
+function exitActivity(){stopSpeak();state.currentActivity=null;state.activityData=null;goTo('world');}
+function replayInstruction(){if(state.activityData&&state.activityData.instruction)speak(state.activityData.instruction);}
+
+/* ---- 1) SENSORY (1–2) ---- */
+function runSensory(){
+  const el=document.getElementById('activityContent');
+  const pick=[...ANIMALS].sort(()=>Math.random()-.5).slice(0,4);
+  state.activityData={instruction:'Sentuh haiwan untuk dengar bunyi',tapped:false};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Sentuh haiwan! 👆</p><div class="grid g2" id="ag"></div>`;
+  const g=document.getElementById('ag');
+  pick.forEach(a=>{
+    const c=document.createElement('div');
+    c.className='card';
+    c.innerHTML=`<div>${a.emoji}</div><div class="label">${a.name}</div>`;
+    c.onclick=()=>{
+      speak(a.name+'. '+a.sound+'!');
+      c.classList.add('correct');
+      setTimeout(()=>c.classList.remove('correct'),600);
+      if(!state.activityData.tapped){
+        state.activityData.tapped=true;
+        setTimeout(()=>{
+          state.activityData=null;
+          showReward(a.emoji,'Bagus! '+a.name,()=>{state.currentActivity=null;goTo('world');});
+        },800);
+      }
+    };
+    g.appendChild(c);
+  });
+  speak('Sentuh haiwan!');
+}
+
+/* ---- 2) MATCH COLOR (2–3) ---- */
+function runMatch(){
+  const el=document.getElementById('activityContent');
+  const target=COLORS[Math.floor(Math.random()*COLORS.length)];
+  const opts=[target,...COLORS.filter(c=>c!==target).sort(()=>Math.random()-.5).slice(0,2)].sort(()=>Math.random()-.5);
+  state.activityData={instruction:'Cari warna '+target.name};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Cari warna <span style="color:${target.hex}">${target.name}</span></p><div class="grid g3" id="cg"></div>`;
+  const g=document.getElementById('cg');
+  opts.forEach(c=>{
+    const card=document.createElement('div');
+    card.className='card';card.style.background=c.hex;card.style.minHeight='120px';
+    card.setAttribute('aria-label',c.name);
+    card.onclick=()=>{
+      if(c===target){
+        card.classList.add('correct');speak('Betul! '+c.name);
+        setTimeout(()=>{state.activityData=null;showReward('🎨','Betul! '+c.name,()=>{state.currentActivity=null;goTo('world');});},500);
+      }else{
+        card.classList.add('wrong');speak('Cuba lagi');
+        setTimeout(()=>card.classList.remove('wrong'),600);
+      }
+    };
+    g.appendChild(card);
+  });
+  speak('Cari warna '+target.name);
+}
+
+/* ---- 3) COUNT (3–4) ---- */
+function runCount(){
+  const el=document.getElementById('activityContent');
+  const n=Math.floor(Math.random()*5)+1;
+  const a=ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
+  const set=new Set([n]);
+  while(set.size<3)set.add(Math.floor(Math.random()*5)+1);
+  const opts=[...set].sort(()=>Math.random()-.5);
+  state.activityData={instruction:'Berapa banyak '+a.name+'?'};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Berapa banyak?</p>
+    <div style="font-size:clamp(40px,10vw,72px);letter-spacing:8px;margin:16px 0;line-height:1.4">${a.emoji.repeat(n)}</div>
+    <div class="grid g3" id="ng"></div>`;
+  const g=document.getElementById('ng');
+  opts.forEach(v=>{
+    const c=document.createElement('div');
+    c.className='card';
+    c.innerHTML=`<div style="font-size:clamp(48px,14vw,72px);font-weight:900;color:var(--primary)">${v}</div>`;
+    c.onclick=()=>{
+      if(v===n){
+        c.classList.add('correct');speak('Betul! '+n);
+        setTimeout(()=>{state.activityData=null;showReward('🔢','Betul! '+n,()=>{state.currentActivity=null;goTo('world');});},500);
+      }else{c.classList.add('wrong');speak('Cuba lagi');setTimeout(()=>c.classList.remove('wrong'),600);}
+    };
+    g.appendChild(c);
+  });
+  speak('Berapa banyak '+a.name+'?');
+}
+
+/* ---- 4) COMPARE (4–5) ---- */
+function runCompare(){
+  const el=document.getElementById('activityContent');
+  let a=Math.floor(Math.random()*5)+2, b=Math.floor(Math.random()*5)+2;
+  while(a===b)b=Math.floor(Math.random()*5)+2;
+  const e=ANIMALS[Math.floor(Math.random()*ANIMALS.length)].emoji;
+  state.activityData={instruction:'Mana lebih banyak?'};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Mana lebih banyak?</p><div class="grid g2" id="cmp"></div>`;
+  const g=document.getElementById('cmp');
+  [a,b].forEach(v=>{
+    const c=document.createElement('div');
+    c.className='card';c.style.minHeight='160px';
+    c.innerHTML=`<div style="font-size:clamp(22px,6vw,36px);line-height:1.4">${e.repeat(v)}</div>`;
+    c.onclick=()=>{
+      if(v===Math.max(a,b)){
+        c.classList.add('correct');speak('Betul! '+Math.max(a,b)+' lebih banyak');
+        setTimeout(()=>{state.activityData=null;showReward('⚖️','Betul!',()=>{state.currentActivity=null;goTo('world');});},500);
+      }else{c.classList.add('wrong');speak('Cuba lagi');setTimeout(()=>c.classList.remove('wrong'),600);}
+    };
+    g.appendChild(c);
+  });
+  speak('Mana lebih banyak?');
+}
+
+/* ---- 5) WORD (5–6) ---- */
+function runWord(){
+  const el=document.getElementById('activityContent');
+  const t=WORDS[Math.floor(Math.random()*WORDS.length)];
+  const letters=t.word.split('');
+  const scr=[...letters].sort(()=>Math.random()-.5);
+  const prog=[];
+  state.activityData={instruction:'Susun huruf untuk '+t.word,answer:t.word,progress:prog};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Susun huruf untuk</p>
+    <div class="big-emoji" style="margin:8px 0">${t.emoji}</div>
+    <div class="letter-slots" id="slots"></div>
+    <div class="letters" id="letters"></div>`;
+  const sEl=document.getElementById('slots'),lEl=document.getElementById('letters');
+  function render(){
+    sEl.innerHTML='';
+    letters.forEach((_,i)=>{
+      const s=document.createElement('div');
+      s.className='slot'+(prog[i]?' filled':'');
+      s.textContent=prog[i]||'';
+      sEl.appendChild(s);
+    });
+  }
+  render();
+  scr.forEach(l=>{
+    const b=document.createElement('button');
+    b.className='letter-btn';b.textContent=l;
+    b.onclick=()=>{
+      const expect=t.word[prog.length];
+      if(l===expect){
+        prog.push(l);b.classList.add('used');speak(l);render();
+        if(prog.length===t.word.length){
+          setTimeout(()=>{state.activityData=null;showReward('📝','Pandai! '+t.word,()=>{state.currentActivity=null;goTo('world');});},400);
+        }
+      }else{
+        b.style.border='3px solid var(--danger)';speak('Cuba lagi');
+        setTimeout(()=>{b.style.border='';},500);
+      }
+    };
+    lEl.appendChild(b);
+  });
+  speak('Susun huruf untuk '+t.word.toLowerCase());
+}
+
+/* ---- PARENT GATE ---- */
+let gateAns=0;
+function openParentGate(){
+  stopSpeak();
+  const a=Math.floor(Math.random()*8)+5, b=Math.floor(Math.random()*8)+5;
+  gateAns=a+b;
+  document.getElementById('lockQuestion').textContent=`${a} + ${b} = ?`;
+  const ch=[gateAns,gateAns+2,gateAns-3,gateAns+5].sort(()=>Math.random()-.5);
+  const c=document.getElementById('lockChoices');c.innerHTML='';
+  ch.forEach(v=>{
+    const btn=document.createElement('button');
+    btn.className='btn';btn.textContent=v;
+    btn.onclick=()=>{
+      if(v===gateAns){buildParentPanel();goTo('parent');}
+      else{btn.style.background='var(--danger)';setTimeout(()=>btn.style.background='',600);}
+    };
+    c.appendChild(btn);
+  });
+  goTo('parentLock');
+}
+
+function buildParentPanel(){
+  const p=document.getElementById('parentPanel');
+  p.innerHTML=`
+    <div class="setting-row"><span>🔊 Bunyi</span><div class="switch ${state.soundOn?'on':''}" id="swSound" role="switch" aria-checked="${state.soundOn}" tabindex="0"></div></div>
+    <div class="setting-row"><span>✨ Animasi</span><div class="switch ${state.animOn?'on':''}" id="swAnim" role="switch" aria-checked="${state.animOn}" tabindex="0"></div></div>
+    <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <span>⭐ Bintang dikumpul</span><div style="font-size:32px;font-weight:900;color:#F39C12">${state.stars}</div>
+    </div>
+    <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <span>📊 Sesi ini</span><div style="font-size:20px;color:#555">Bintang: ${state.starsPerSession}</div>
+    </div>
+    <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <span>💡 Aktiviti Luar Skrin</span>
+      <div style="font-size:15px;color:#555;font-weight:500;line-height:1.6">
+        • Bercakap tentang haiwan di sekeliling<br>
+        • Kira objek semasa mengemas<br>
+        • Bermain warna dengan pakaian<br>
+        • Nyanyi lagu ABC bersama<br>
+        • Baca buku bergambar 10 minit
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:20px">
+      <button class="btn secondary small" onclick="resetProgress()">Reset Bintang</button>
+      <button class="btn small" onclick="goTo('home')">Kembali</button>
+    </div>`;
+  document.getElementById('swSound').onclick=e=>{
+    state.soundOn=!state.soundOn;e.target.classList.toggle('on',state.soundOn);
+    e.target.setAttribute('aria-checked',state.soundOn);
+    localStorage.setItem('gkid_sound',state.soundOn?'on':'off');
+    if(state.soundOn)speak('Bunyi dihidupkan');
+  };
+  document.getElementById('swAnim').onclick=e=>{
+    state.animOn=!state.animOn;e.target.classList.toggle('on',state.animOn);
+    e.target.setAttribute('aria-checked',state.animOn);
+    document.body.classList.toggle('anim-off',!state.animOn);
+    localStorage.setItem('gkid_anim',state.animOn?'on':'off');
+  };
+}
+function resetProgress(){
+  if(confirm('Padam semua bintang?')){state.stars=0;updateStars();buildParentPanel();}
+}
+
+/* ---- SERVICE WORKER REGISTRATION ---- */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(r => console.log('[GkiD] SW registered:', r.scope))
+      .catch(e => console.warn('[GkiD] SW failed:', e));
+  });
+}
+</script>
+</body>
+</html>
+
