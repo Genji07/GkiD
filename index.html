@@ -145,6 +145,34 @@ p {
   line-height: 1.2;
 }
 
+.photo-pic {
+  display: block;
+  width: min(72vw, 310px);
+  height: 220px;
+  object-fit: cover;
+  border-radius: 22px;
+  margin: 8px auto;
+  background: #fff;
+  box-shadow: 0 4px 14px #00000014;
+}
+
+.card .photo-pic {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 12px;
+}
+
+.media-credit {
+  display: block;
+  max-width: 310px;
+  margin: 0 auto 10px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #58636d;
+}
+
 .label {
   font-size: clamp(12px, 3.5vw, 17px);
   font-weight: 800;
@@ -414,6 +442,7 @@ function save(key, value) {
 /* ---------------- VOICE ---------------- */
 
 let selectedVoice = null;
+let animalAudio = null;
 let voiceTimer = null;
 
 function loadVoices() {
@@ -438,6 +467,11 @@ if ('speechSynthesis' in window) {
 function stopVoice() {
   clearTimeout(voiceTimer);
   if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (animalAudio) {
+    animalAudio.pause();
+    animalAudio.currentTime = 0;
+    animalAudio = null;
+  }
 }
 
 function speak(text) {
@@ -468,6 +502,28 @@ function speak(text) {
   }, 100);
 }
 
+function playAnimalSound(animal) {
+  if (!state.sound) {
+    toast('Hidupkan bunyi dalam tetapan ibu bapa dahulu.');
+    return;
+  }
+  if (!animal.audio) {
+    toast('Bunyi sebenar untuk ikan belum disediakan.');
+    return;
+  }
+  if (animalAudio) {
+    animalAudio.pause();
+    animalAudio.currentTime = 0;
+  }
+  animalAudio = new Audio(animal.audio);
+  animalAudio.preload = 'none';
+  animalAudio.onerror = () => toast('Bunyi tidak dapat dimuatkan. Semak sambungan internet.');
+  const playback = animalAudio.play();
+  if (playback && typeof playback.catch === 'function') {
+    playback.catch(() => toast('Telefon tidak dapat memainkan fail bunyi ini.'));
+  }
+}
+
 function repeatInstruction() {
   speak(state.instruction);
 }
@@ -494,14 +550,53 @@ const WORLDS = {
 };
 
 const ANIMALS = [
-  { icon: '🐱', name: 'Kucing', sound: 'Meow' },
-  { icon: '🐶', name: 'Anjing', sound: 'Woof' },
-  { icon: '🐮', name: 'Lembu', sound: 'Moo' },
-  { icon: '🐸', name: 'Katak', sound: 'Croak' },
-  { icon: '🦆', name: 'Itik', sound: 'Quack' },
-  { icon: '🐔', name: 'Ayam', sound: 'Kok kok' },
-  { icon: '🐘', name: 'Gajah', sound: 'Gajah' },
-  { icon: '🐟', name: 'Ikan', sound: 'Ikan' }
+  {
+    icon: '🐱', name: 'Kucing', sound: 'Mengiau',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Cat.jpg?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Meow.ogg',
+    credit: 'Foto: Halved sandwich / Wikimedia Commons (domain awam).'
+  },
+  {
+    icon: '🐶', name: 'Anjing', sound: 'Menyalak',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Dog.jpg?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Barking_of_a_dog_2.ogg',
+    credit: 'Foto: KCZooFan / Wikimedia Commons (CC BY-SA 2.0).'
+  },
+  {
+    icon: '🐮', name: 'Lembu', sound: 'Melenguh',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Cow_photography.jpg?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mudchute_cow_1.ogg',
+    credit: 'Foto: Viveka Ravichandran V / Wikimedia Commons (CC0).'
+  },
+  {
+    icon: '🐸', name: 'Katak', sound: 'Menguak',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Green_Frog.jpg?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Single_Frog_Croak.oga',
+    credit: 'Foto: Bruce Lucas / Wikimedia Commons (CC BY-SA 3.0).'
+  },
+  {
+    icon: '🦆', name: 'Itik', sound: 'Berkuak',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/A_Mallard_duck.jpg?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Male_ducks_do_quack.ogv',
+    credit: 'Foto: Versions111 / Wikimedia Commons (CC BY 4.0).'
+  },
+  {
+    icon: '🐔', name: 'Ayam', sound: 'Berkokok',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chicken.JPG?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Medium_rooster_crowing.ogg',
+    credit: 'Foto: Andreagrossmann / Wikimedia Commons (domain awam).'
+  },
+  {
+    icon: '🐘', name: 'Gajah', sound: 'Membunyikan trompet',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Elephant.jpg?width=500',
+    audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Elephant_voice_-_trumpeting.ogg',
+    credit: 'Foto: Stuart Bassil / Wikimedia Commons (CC BY 2.0).'
+  },
+  {
+    icon: '🐟', name: 'Ikan', sound: 'Bunyi ikan belum disediakan',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Fish_photo.jpg?width=500',
+    credit: 'Foto: Mohanraj55 / Wikimedia Commons (CC0).'
+  }
 ];
 
 const COLORS = [
@@ -744,10 +839,32 @@ function title(content, text) {
 }
 
 function visual(content, icon, label = '') {
-  const div = document.createElement('div');
-  div.className = 'big-pic';
-  div.textContent = icon;
-  content.appendChild(div);
+  const animal = ANIMALS.find(item => item.icon === icon && item.image);
+  if (animal) {
+    const img = document.createElement('img');
+    img.className = 'photo-pic';
+    img.src = animal.image;
+    img.alt = animal.name;
+    img.loading = 'lazy';
+    img.onerror = () => {
+      const fallback = document.createElement('div');
+      fallback.className = 'big-pic';
+      fallback.textContent = icon;
+      img.replaceWith(fallback);
+    };
+    content.appendChild(img);
+    if (animal.credit) {
+      const credit = document.createElement('small');
+      credit.className = 'media-credit';
+      credit.textContent = animal.credit;
+      content.appendChild(credit);
+    }
+  } else {
+    const div = document.createElement('div');
+    div.className = 'big-pic';
+    div.textContent = icon;
+    content.appendChild(div);
+  }
 
   if (label) title(content, label);
 }
@@ -760,9 +877,24 @@ function cardGrid(content, items, onPick, columns = 3) {
     const card = document.createElement('button');
     card.className = 'card';
 
-    const icon = document.createElement('span');
-    icon.className = 'pic';
-    icon.textContent = item.icon ?? item.letter ?? item.word ?? '?';
+    let icon;
+    if (item.image) {
+      icon = document.createElement('img');
+      icon.className = 'pic photo-pic';
+      icon.src = item.image;
+      icon.alt = item.name || item.word || item.letter || 'Gambar pembelajaran';
+      icon.loading = 'lazy';
+      icon.onerror = () => {
+        const fallback = document.createElement('span');
+        fallback.className = 'pic';
+        fallback.textContent = item.icon ?? item.letter ?? item.word ?? '?';
+        icon.replaceWith(fallback);
+      };
+    } else {
+      icon = document.createElement('span');
+      icon.className = 'pic';
+      icon.textContent = item.icon ?? item.letter ?? item.word ?? '?';
+    }
 
     const label = document.createElement('span');
     label.className = 'label';
@@ -851,15 +983,20 @@ function finishLevel() {
 function sensoryQuestion(content) {
   const animal = sample(ANIMALS);
 
-  title(content, 'Sentuh haiwan untuk mengenalinya.');
+  title(content, 'Kenali haiwan melalui gambar dan bunyi.');
   visual(content, animal.icon, animal.name);
 
-  const button = document.createElement('button');
-  button.className = 'btn';
-  button.textContent = '🔊 Dengar sekali lagi';
+  const voiceButton = document.createElement('button');
+  voiceButton.className = 'btn';
+  voiceButton.textContent = '🗣️ Sebut nama haiwan';
+  voiceButton.onclick = () => speak('Ini ialah ' + animal.name + '.');
+  content.appendChild(voiceButton);
 
-  button.onclick = () => speak(animal.name + '. Bunyi ' + animal.sound);
-  content.appendChild(button);
+  const soundButton = document.createElement('button');
+  soundButton.className = 'btn secondary';
+  soundButton.textContent = '🔊 Dengar bunyi sebenar';
+  soundButton.onclick = () => playAnimalSound(animal);
+  content.appendChild(soundButton);
 
   const next = document.createElement('button');
   next.className = 'btn secondary';
