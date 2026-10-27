@@ -577,6 +577,20 @@ body {
   .game-question-body .card.wrong { animation:none; }
 }
 
+
+/* ---------------- ADVENTURE MAP ---------------- */
+.adventure-guide{display:flex;align-items:center;gap:13px;width:100%;max-width:900px;margin:12px auto 22px;padding:15px 17px;text-align:left;border:1px solid #e3ecdf;border-radius:24px;background:linear-gradient(115deg,#fff 0%,#f1fff5 100%);box-shadow:0 9px 25px rgba(40,70,52,.06)}
+.guide-mascot{display:grid;place-items:center;flex:0 0 62px;height:62px;border-radius:22px;background:#ffefd6;font-size:39px;animation:guide-bob 2.4s ease-in-out infinite}
+.guide-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}.guide-copy strong{font-size:14px;font-weight:950}.guide-copy span{font-size:12px;line-height:1.45;color:#718277}
+.guide-stars{display:flex;align-items:center;gap:4px;padding:8px 10px;border-radius:14px;background:#fff8df;color:#a87b13;font-size:13px}.guide-stars strong{font-size:14px}
+.adventure-map{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;width:100%;max-width:900px;margin:0 auto 20px;padding:20px 12px;border:1px solid #e2ecdf;border-radius:28px;background:radial-gradient(ellipse at 20% 15%,#fff4d6,transparent 36%),radial-gradient(ellipse at 80% 80%,#e2f7e9,transparent 42%),#fdfef9;overflow:hidden}
+.adventure-map:before{content:"";position:absolute;inset:12% 8%;border:3px dashed #c5dfc8;border-radius:44% 36% 45% 30%;pointer-events:none}
+.map-stop{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;min-width:0;min-height:118px;padding:10px 5px;border:2px solid #e6eee2;border-radius:22px;background:#fff;box-shadow:0 5px 0 #e7eee3;transition:transform .18s,border-color .18s;}
+.map-stop:nth-child(4n+2),.map-stop:nth-child(4n+4){transform:translateY(10px)}.map-stop:hover{transform:translateY(-3px)}.map-stop:active{transform:scale(.96)}.map-stop.recommended{border-color:#69c6a4;background:#f3fff7;box-shadow:0 5px 0 #ccebd8}.map-stop.done{border-color:#f0d27c;background:#fffdf2}.map-stop-icon{display:grid;place-items:center;width:51px;height:51px;border-radius:17px;background:#fff0d8;font-size:29px}.map-stop-name{font-size:12px;font-weight:900;line-height:1.2}.map-stop-status{font-size:10px;font-weight:800;color:#6e9b80}.map-stop-number{position:absolute;top:5px;left:8px;color:#a2b2a5;font-size:9px;font-weight:950}
+.world-list-details{width:100%;max-width:900px;margin:0 auto 16px;text-align:left}.world-list-details summary{cursor:pointer;display:inline-block;padding:10px 14px;border:1px solid #e2ece1;border-radius:14px;background:#fff;color:#557264;font-size:12px;font-weight:850}.world-list-details .grid{margin-top:12px}
+@keyframes guide-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+@media(max-width:600px){.adventure-guide{gap:9px;padding:12px}.guide-mascot{flex-basis:50px;height:50px;font-size:31px;border-radius:17px}.guide-copy strong{font-size:12px}.guide-copy span{font-size:11px}.guide-stars{padding:7px}.adventure-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:15px 10px}.map-stop{min-height:108px}.map-stop:nth-child(4n+2),.map-stop:nth-child(4n+4){transform:none}.map-stop:nth-child(even){transform:translateY(7px)}.map-stop:nth-child(even):hover{transform:translateY(3px)}}
+@media(prefers-reduced-motion:reduce){.guide-mascot{animation:none}}
 </style>
 </head>
 
@@ -650,9 +664,18 @@ body {
   </section>
 
   <section class="screen" id="worlds">
-    <h2>🌍 Pilih Dunia</h2>
+    <h2>🗺️ Peta Pengembaraan</h2>
     <p id="ageInfo"></p>
-    <div class="grid g2" id="worldGrid"></div>
+    <div class="adventure-guide" aria-live="polite">
+      <div class="guide-mascot" aria-hidden="true">🦊</div>
+      <div class="guide-copy"><strong>Hai, kawan pengembara!</strong><span id="guideMessage">Pilih satu tempat di peta dan kumpul bintang sambil belajar.</span></div>
+      <div class="guide-stars" aria-label="Jumlah bintang"><span>⭐</span><strong id="mapStarCount">0</strong></div>
+    </div>
+    <div class="adventure-map" id="adventureMap" aria-label="Peta dunia pembelajaran"></div>
+    <details class="world-list-details">
+      <summary>📚 Lihat semua dunia dalam bentuk senarai</summary>
+      <div class="grid g2" id="worldGrid"></div>
+    </details>
     <button class="btn secondary" onclick="showScreen('ages')">Tukar Umur</button>
   </section>
 
@@ -1122,7 +1145,17 @@ function renderAges() {
 
 function renderWorlds() {
   document.getElementById('ageInfo').textContent =
-    'Umur dipilih: ' + AGES[state.age].label + ' · Pilih dunia yang ingin diteroka.';
+    'Umur dipilih: ' + AGES[state.age].label + ' · Pilih tempat di peta untuk mula bermain.';
+  document.getElementById('mapStarCount').textContent = state.stars;
+  const guide = document.getElementById('guideMessage');
+  if (guide) {
+    const completedWorlds = Object.keys(WORLDS).filter(key =>
+      [1, 2, 3].every(level => (state.progress[key + '_' + level] || 0) >= 5)
+    ).length;
+    guide.textContent = completedWorlds
+      ? 'Hebat! Kamu sudah habiskan ' + completedWorlds + ' dunia. Jom teroka tempat seterusnya!'
+      : 'Pilih satu tempat di peta dan kumpul bintang sambil belajar.';
+  }
 
   const descriptions = {
     sensory: 'Kenal haiwan, gambar dan bunyi.',
@@ -1134,22 +1167,39 @@ function renderWorlds() {
     emotion: 'Kenal dan fahami perasaan.',
     pattern: 'Cari corak dan bentuk yang sama.'
   };
+  const map = document.getElementById('adventureMap');
   const grid = document.getElementById('worldGrid');
+  map.innerHTML = '';
   grid.innerHTML = '';
 
   Object.entries(WORLDS).forEach(([key, world], index) => {
+    const recommended = key === AGES[state.age].recommended;
+    const completed = [1, 2, 3].filter(level => (state.progress[key + '_' + level] || 0) >= 5).length;
+    const stop = document.createElement('button');
+    stop.type = 'button';
+    stop.className = 'map-stop' + (recommended ? ' recommended' : '') + (completed === 3 ? ' done' : '');
+    stop.innerHTML =
+      '<span class="map-stop-number">0' + (index + 1) + '</span>' +
+      '<span class="map-stop-icon">' + world.icon + '</span>' +
+      '<span class="map-stop-name">' + world.name + '</span>' +
+      '<span class="map-stop-status">' + (completed === 3 ? '🏅 Selesai' : completed + '/3 tahap') + '</span>';
+    stop.setAttribute('aria-label', world.name + '. ' + descriptions[key] + '. ' + completed + ' daripada 3 tahap selesai.');
+    stop.onclick = () => {
+      state.world = key;
+      renderLevels(key);
+    };
+    map.appendChild(stop);
+
     const card = document.createElement('button');
     card.className = 'card world-card';
-    const recommended = key === AGES[state.age].recommended;
     if (recommended) card.classList.add('recommended');
-    const completed = [1, 2, 3].filter(level => (state.progress[key + '_' + level] || 0) >= 5).length;
     card.innerHTML =
-      `<span class="world-icon world-tone-${index % 8}">${world.icon}</span>
-       <span class="world-card-copy"><span class="label">${world.name}</span>
-       <span class="world-description">${descriptions[key]}</span>
-       <span class="world-progress"><span class="world-progress-fill" style="width:${completed / 3 * 100}%"></span></span>
-       <span class="world-meta">${recommended ? '✦ Disyorkan untuk umur ini' : 'Dunia ' + (index + 1)} · ${completed}/3 tahap selesai</span></span>
-       <span class="world-arrow" aria-hidden="true">›</span>`;
+      '<span class="world-icon world-tone-' + (index % 8) + '">' + world.icon + '</span>' +
+      '<span class="world-card-copy"><span class="label">' + world.name + '</span>' +
+      '<span class="world-description">' + descriptions[key] + '</span>' +
+      '<span class="world-progress"><span class="world-progress-fill" style="width:' + (completed / 3 * 100) + '%"></span></span>' +
+      '<span class="world-meta">' + (recommended ? '✦ Disyorkan untuk umur ini' : 'Dunia ' + (index + 1)) + ' · ' + completed + '/3 tahap selesai</span></span>' +
+      '<span class="world-arrow" aria-hidden="true">›</span>';
     card.setAttribute('aria-label', world.name + '. ' + descriptions[key]);
     card.onclick = () => renderLevels(key);
     grid.appendChild(card);
