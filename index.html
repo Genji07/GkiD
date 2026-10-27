@@ -451,6 +451,7 @@ function save(key, value) {
 let selectedVoice = null;
 let animalAudio = null;
 let voiceTimer = null;
+let musicContext = null;
 
 function loadVoices() {
   if (!('speechSynthesis' in window)) return;
@@ -474,6 +475,11 @@ if ('speechSynthesis' in window) {
 function stopVoice() {
   clearTimeout(voiceTimer);
   if ('speechSynthesis' in window) speechSynthesis.cancel();
+  if (musicContext) {
+    const contextToClose = musicContext;
+    musicContext = null;
+    try { contextToClose.close(); } catch {}
+  }
   if (animalAudio) {
     animalAudio.pause();
     animalAudio.currentTime = 0;
@@ -507,6 +513,80 @@ function speak(text) {
       toast('Tidak dapat memainkan suara.');
     }
   }, 100);
+}
+
+function playSpellingSong() {
+  if (!state.sound) {
+    toast('Hidupkan bunyi dalam tetapan ibu bapa dahulu.');
+    return;
+  }
+  if (!('AudioContext' in window) && !('webkitAudioContext' in window)) {
+    speak('Mari belajar, mari mengeja. A, B, C, sebut bersama. B, O, L, A, bola. B, U, K, U, buku. Baca dan eja, kita berjaya!');
+    return;
+  }
+
+  stopVoice();
+  loadVoices();
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  let context;
+  try {
+    context = new AudioContextClass();
+    musicContext = context;
+  } catch {
+    speak('Mari belajar, mari mengeja. A, B, C, sebut bersama. B, O, L, A, bola. B, U, K, U, buku. Baca dan eja, kita berjaya!');
+    return;
+  }
+
+  // Melodi asli ringkas dijana dalam telefon, jadi tidak memerlukan fail muzik luar.
+  const notes = [
+    262, 294, 330, 262, 262, 294, 330, 262,
+    330, 349, 392, 392, 330, 349, 392, 392,
+    392, 440, 392, 349, 330, 262, 392, 330,
+    294, 262, 294, 330, 349, 330, 294, 262
+  ];
+  const startAt = context.currentTime + 0.08;
+  const beat = 0.22;
+
+  notes.forEach((frequency, index) => {
+    const start = startAt + index * beat;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, start);
+    gain.gain.setValueAtTime(0.0001, start);
+    gain.gain.exponentialRampToValueAtTime(0.10, start + 0.025);
+    gain.gain.setValueAtTime(0.10, start + beat * 0.65);
+    gain.gain.exponentialRampToValueAtTime(0.0001, start + beat * 0.92);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(start);
+    oscillator.stop(start + beat);
+  });
+
+  const lyrics = 'Mari belajar, mari mengeja. A, B, C, sebut bersama. B, O, L, A, bola. B, U, K, U, buku. Baca dan eja, kita berjaya!';
+  const utterance = new SpeechSynthesisUtterance(lyrics);
+  utterance.lang = selectedVoice?.lang || 'ms-MY';
+  utterance.rate = 0.78;
+  utterance.pitch = 1.12;
+  if (selectedVoice) utterance.voice = selectedVoice;
+  const finishMusic = () => {
+    if (musicContext === context) {
+      musicContext = null;
+      try { context.close(); } catch {}
+    }
+  };
+  utterance.onend = finishMusic;
+  utterance.onerror = finishMusic;
+
+  context.resume().then(() => {
+    if (musicContext === context && 'speechSynthesis' in window) {
+      speechSynthesis.speak(utterance);
+    }
+  }).catch(() => {
+    finishMusic();
+    toast('Audio tidak dapat dimainkan pada telefon ini.');
+  });
 }
 
 function playAnimalSound(animal) {
@@ -1154,6 +1234,18 @@ function wordQuestion(content, level) {
   const word = sample(WORDS);
 
   visual(content, word.icon);
+
+  const songButton = document.createElement('button');
+  songButton.className = 'btn secondary';
+  songButton.textContent = '🎵 Dengar lagu Mari Mengeja';
+  songButton.onclick = playSpellingSong;
+  content.appendChild(songButton);
+
+  const songLyrics = document.createElement('p');
+  songLyrics.className = 'setting';
+  songLyrics.style.display = 'block';
+  songLyrics.textContent = 'Mari belajar, mari mengeja! A-B-C sebut bersama. B-O-L-A, bola! B-U-K-U, buku! Baca dan eja, kita berjaya!';
+  content.appendChild(songLyrics);
 
   if (level === 1) {
     title(content, 'Pilih perkataan yang betul.');
