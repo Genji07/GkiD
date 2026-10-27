@@ -164,6 +164,13 @@ p {
   border-radius: 12px;
 }
 
+.card .media-credit {
+  max-width: 100%;
+  margin: 0;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
 .media-credit {
   display: block;
   max-width: 310px;
@@ -877,11 +884,13 @@ function cardGrid(content, items, onPick, columns = 3) {
     const card = document.createElement('button');
     card.className = 'card';
 
+    const animalPhoto = ANIMALS.find(animal => animal.icon === item.icon);
+    const imageUrl = item.image || animalPhoto?.image;
     let icon;
-    if (item.image) {
+    if (imageUrl) {
       icon = document.createElement('img');
       icon.className = 'pic photo-pic';
-      icon.src = item.image;
+      icon.src = imageUrl;
       icon.alt = item.name || item.word || item.letter || 'Gambar pembelajaran';
       icon.loading = 'lazy';
       icon.onerror = () => {
@@ -903,6 +912,12 @@ function cardGrid(content, items, onPick, columns = 3) {
     card.append(icon);
 
     if (label.textContent) card.append(label);
+    if (imageUrl && (item.credit || animalPhoto?.credit)) {
+      const credit = document.createElement('small');
+      credit.className = 'media-credit';
+      credit.textContent = item.credit || animalPhoto.credit;
+      card.append(credit);
+    }
 
     card.onclick = () => onPick(item, card);
     grid.appendChild(card);
