@@ -565,6 +565,17 @@ function playSpellingSong() {
   });
 
   const lyrics = 'Mari belajar, mari mengeja. A, B, C, sebut bersama. B, O, L, A, bola. B, U, K, U, buku. Baca dan eja, kita berjaya!';
+  if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+    context.resume().catch(() => {});
+    setTimeout(() => {
+      if (musicContext === context) {
+        musicContext = null;
+        try { context.close(); } catch {}
+      }
+    }, notes.length * beat * 1000 + 250);
+    toast('Melodi dimainkan. Suara sebutan tidak disokong oleh pelayar ini.');
+    return;
+  }
   const utterance = new SpeechSynthesisUtterance(lyrics);
   utterance.lang = selectedVoice?.lang || 'ms-MY';
   utterance.rate = 0.78;
