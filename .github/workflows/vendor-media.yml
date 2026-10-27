@@ -1,0 +1,137 @@
+name: Vendor learning media
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/vendor-media.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  download-and-vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install media tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick ffmpeg
+      - name: Download and optimise openly licensed media
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/animals assets/sounds
+          download() {
+            local url="$1" output="$2"
+            curl --fail --location --silent --show-error --retry 3 --retry-delay 2 \
+              -A "GkiD educational app media (GitHub repository)" "$url" -o "$output"
+          }
+          fetch_image() {
+            local filename="$1" out="$2"
+            local tmp
+            tmp="$(mktemp)"
+            download "https://commons.wikimedia.org/wiki/Special:FilePath/${filename}?width=1200" "$tmp"
+            convert "$tmp" -auto-orient -strip -resize '1200x1200>' -quality 84 "$out"
+            rm -f "$tmp"
+          }
+          fetch_audio() {
+            local filename="$1" out="$2"
+            local tmp
+            tmp="$(mktemp)"
+            download "https://commons.wikimedia.org/wiki/Special:FilePath/${filename}" "$tmp"
+            ffmpeg -nostdin -hide_banner -loglevel error -y -i "$tmp" -vn -ac 1 -ar 22050 -c:a libvorbis -q:a 4 "$out"
+            rm -f "$tmp"
+          }
+
+          fetch_image 'Domestic_Cat.jpg' 'assets/animals/cat.jpg'
+          fetch_image 'Domestic_Dog.jpg' 'assets/animals/dog.jpg'
+          fetch_image 'Cow_photography.jpg' 'assets/animals/cow.jpg'
+          fetch_image 'Green_Frog.jpg' 'assets/animals/frog.jpg'
+          fetch_image 'A_Mallard_duck.jpg' 'assets/animals/duck.jpg'
+          fetch_image 'Chicken.JPG' 'assets/animals/chicken.jpg'
+          fetch_image 'Elephant.jpg' 'assets/animals/elephant.jpg'
+          fetch_image 'Fish_photo.jpg' 'assets/animals/fish.jpg'
+
+          fetch_audio 'Meow.ogg' 'assets/sounds/cat.ogg'
+          fetch_audio 'Barking_of_a_dog_2.ogg' 'assets/sounds/dog.ogg'
+          fetch_audio 'Single_Cow_Moo.ogg' 'assets/sounds/cow.ogg'
+          fetch_audio 'Single_Frog_Croak.oga' 'assets/sounds/frog.ogg'
+          fetch_audio 'Male_ducks_do_quack.ogv' 'assets/sounds/duck.ogg'
+          fetch_audio 'Medium_rooster_crowing.ogg' 'assets/sounds/chicken.ogg'
+          fetch_audio 'Elephant_voice_-_trumpeting.ogg' 'assets/sounds/elephant.ogg'
+
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path("index.html")
+          text = path.read_text(encoding="utf-8")
+          replacements = {
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Cat.jpg?width=960": "./assets/animals/cat.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Dog.jpg?width=960": "./assets/animals/dog.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Cow_photography.jpg?width=960": "./assets/animals/cow.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Green_Frog.jpg?width=960": "./assets/animals/frog.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/A_Mallard_duck.jpg?width=960": "./assets/animals/duck.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Chicken.JPG?width=960": "./assets/animals/chicken.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Elephant.jpg?width=960": "./assets/animals/elephant.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Fish_photo.jpg?width=960": "./assets/animals/fish.jpg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Meow.ogg": "./assets/sounds/cat.ogg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Barking_of_a_dog_2.ogg": "./assets/sounds/dog.ogg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Mudchute_cow_1.ogg": "./assets/sounds/cow.ogg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Single_Frog_Croak.oga": "./assets/sounds/frog.ogg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Male_ducks_do_quack.ogv": "./assets/sounds/duck.ogg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Medium_rooster_crowing.ogg": "./assets/sounds/chicken.ogg",
+              "https://commons.wikimedia.org/wiki/Special:FilePath/Elephant_voice_-_trumpeting.ogg": "./assets/sounds/elephant.ogg",
+          }
+          for old, new in replacements.items():
+              if old not in text:
+                  raise SystemExit(f"Expected media reference not found: {old}")
+              text = text.replace(old, new)
+          text = text.replace(
+              "Bunyi: Secretlondon / Wikimedia Commons (GFDL).",
+              "Bunyi: MichaeltheFox8621 / Wikimedia Commons (CC BY-SA 4.0)."
+          )
+          path.write_text(text, encoding="utf-8")
+          PY
+      - name: Write media attribution
+        run: |
+          cat > assets/ATTRIBUTION.md <<'EOF'
+          # GkiD media attribution
+
+          The media below are redistributed with their individual licences. Images were resized to a maximum of 1200 px and recompressed as JPEG. Audio was converted to mono Ogg Vorbis at 22.05 kHz for app compatibility. These format changes are noted to comply with attribution requirements.
+
+          ## Animal photographs
+
+          - **Domestic Cat.jpg** — Halved sandwich; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Domestic_Cat.jpg); public domain.
+          - **Domestic Dog.jpg** — KCZooFan; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Domestic_Dog.jpg); [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/).
+          - **Cow photography.jpg** — Viveka Ravichandran V; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Cow_photography.jpg); CC0.
+          - **Green Frog.jpg** — Bruce Lucas; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Green_Frog.jpg); [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+          - **A Mallard duck.jpg** — Versions111; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:A_Mallard_duck.jpg); [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+          - **Chicken.JPG** — Andreagrossmann; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Chicken.JPG); public domain.
+          - **Elephant.jpg** — Stuart Bassil; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Elephant.jpg); [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+          - **Fish photo.jpg** — Mohanraj55; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Fish_photo.jpg); CC0.
+
+          ## Animal sounds
+
+          - **Meow.ogg** — Dcrosby; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Meow.ogg); [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+          - **Barking of a dog 2.ogg** — Amada44; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Barking_of_a_dog_2.ogg); [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+          - **Single Cow Moo.ogg** — MichaeltheFox8621; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Single_Cow_Moo.ogg); [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+          - **Single Frog Croak.oga** — MichaeltheFox8621; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Single_Frog_Croak.oga); [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+          - **Male ducks do quack.ogv** — Tony Wills; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Male_ducks_do_quack.ogv); [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+          - **Medium rooster crowing.ogg** — alys; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Medium_rooster_crowing.ogg); public domain.
+          - **Elephant voice - trumpeting.ogg** — தகவலுழவன்; [Wikimedia Commons source](https://commons.wikimedia.org/wiki/File:Elephant_voice_-_trumpeting.ogg); CC0.
+
+          Animal sound for fish is intentionally omitted: fish do not have one universal characteristic sound, and no suitable licensed recording has been added.
+          EOF
+      - name: Commit bundled media
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/
+          if git diff --cached --quiet; then
+            echo "No media changes to commit."
+          else
+            git commit -m "Bundle optimised animal media with licence attributions"
+            git push
+          fi
