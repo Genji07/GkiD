@@ -552,7 +552,7 @@ const ABC = [
 
 /* ---------------- NAVIGATION ---------------- */
 
-function showScreen(id) {
+function showScreen(id, renderParentSettings = true) {
   stopVoice();
 
   document.querySelectorAll('.screen').forEach(screen => {
@@ -565,7 +565,7 @@ function showScreen(id) {
   document.getElementById('topBar').hidden = id !== 'activity';
 
   if (id === 'worlds') renderWorlds();
-  if (id === 'parent') renderParent();
+  if (id === 'parent' && renderParentSettings) renderParent();
 }
 
 function updateCounter() {
@@ -1297,7 +1297,9 @@ function parentGate() {
     });
 
   panel.appendChild(grid);
-  showScreen('parent');
+  // Paparkan soalan pengesahan dahulu; jangan biarkan renderParent()
+  // menindih soalan sebelum jawapan dipilih.
+  showScreen('parent', false);
 }
 
 function renderParent() {
