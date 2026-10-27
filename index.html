@@ -559,49 +559,49 @@ const WORLDS = {
 const ANIMALS = [
   {
     icon: '🐱', name: 'Kucing', sound: 'Mengiau',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Cat.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Cat.jpg?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Meow.ogg',
     credit: 'Foto: Halved sandwich / Wikimedia Commons (domain awam). Bunyi: Dcrosby / Wikimedia Commons (CC BY-SA 3.0).'
   },
   {
     icon: '🐶', name: 'Anjing', sound: 'Menyalak',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Dog.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Domestic_Dog.jpg?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Barking_of_a_dog_2.ogg',
     credit: 'Foto: KCZooFan / Wikimedia Commons (CC BY-SA 2.0). Bunyi: Amada44 / Wikimedia Commons (CC BY-SA 3.0).'
   },
   {
     icon: '🐮', name: 'Lembu', sound: 'Melenguh',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Cow_photography.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Cow_photography.jpg?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mudchute_cow_1.ogg',
     credit: 'Foto: Viveka Ravichandran V / Wikimedia Commons (CC0). Bunyi: Secretlondon / Wikimedia Commons (GFDL).'
   },
   {
     icon: '🐸', name: 'Katak', sound: 'Menguak',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Green_Frog.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Green_Frog.jpg?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Single_Frog_Croak.oga',
     credit: 'Foto: Bruce Lucas / Wikimedia Commons (CC BY-SA 3.0). Bunyi: MichaeltheFox8621 / Wikimedia Commons (CC BY-SA).'
   },
   {
     icon: '🦆', name: 'Itik', sound: 'Berkuak',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/A_Mallard_duck.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/A_Mallard_duck.jpg?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Male_ducks_do_quack.ogv',
     credit: 'Foto: Versions111 / Wikimedia Commons (CC BY 4.0). Bunyi: Tony Wills / Wikimedia Commons (CC BY-SA 3.0).'
   },
   {
     icon: '🐔', name: 'Ayam', sound: 'Berkokok',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chicken.JPG?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Chicken.JPG?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Medium_rooster_crowing.ogg',
     credit: 'Foto: Andreagrossmann / Wikimedia Commons (domain awam). Bunyi: alys / Wikimedia Commons (domain awam).'
   },
   {
     icon: '🐘', name: 'Gajah', sound: 'Membunyikan trompet',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Elephant.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Elephant.jpg?width=960',
     audio: 'https://commons.wikimedia.org/wiki/Special:FilePath/Elephant_voice_-_trumpeting.ogg',
     credit: 'Foto: Stuart Bassil / Wikimedia Commons (CC BY 2.0). Bunyi: தகவலுழவன் / Wikimedia Commons (CC0).'
   },
   {
     icon: '🐟', name: 'Ikan', sound: 'Bunyi ikan belum disediakan',
-    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Fish_photo.jpg?width=500',
+    image: 'https://commons.wikimedia.org/wiki/Special:FilePath/Fish_photo.jpg?width=960',
     credit: 'Foto: Mohanraj55 / Wikimedia Commons (CC0).'
   }
 ];
@@ -853,6 +853,7 @@ function visual(content, icon, label = '') {
     img.src = animal.image;
     img.alt = animal.name;
     img.loading = 'lazy';
+    img.decoding = 'async';
     img.onerror = () => {
       const fallback = document.createElement('div');
       fallback.className = 'big-pic';
@@ -860,12 +861,6 @@ function visual(content, icon, label = '') {
       img.replaceWith(fallback);
     };
     content.appendChild(img);
-    if (animal.credit) {
-      const credit = document.createElement('small');
-      credit.className = 'media-credit';
-      credit.textContent = animal.credit;
-      content.appendChild(credit);
-    }
   } else {
     const div = document.createElement('div');
     div.className = 'big-pic';
@@ -885,7 +880,10 @@ function cardGrid(content, items, onPick, columns = 3) {
     card.className = 'card';
 
     const animalPhoto = ANIMALS.find(animal => animal.icon === item.icon);
-    const imageUrl = item.image || animalPhoto?.image;
+    // Kad kecil guna thumbnail 500px supaya ringan; paparan utama guna 960px.
+    const imageUrl = animalPhoto?.image
+      ? animalPhoto.image.replace('?width=960', '?width=500')
+      : item.image;
     let icon;
     if (imageUrl) {
       icon = document.createElement('img');
@@ -893,6 +891,7 @@ function cardGrid(content, items, onPick, columns = 3) {
       icon.src = imageUrl;
       icon.alt = item.name || item.word || item.letter || 'Gambar pembelajaran';
       icon.loading = 'lazy';
+      icon.decoding = 'async';
       icon.onerror = () => {
         const fallback = document.createElement('span');
         fallback.className = 'pic';
@@ -912,12 +911,6 @@ function cardGrid(content, items, onPick, columns = 3) {
     card.append(icon);
 
     if (label.textContent) card.append(label);
-    if (imageUrl && (item.credit || animalPhoto?.credit)) {
-      const credit = document.createElement('small');
-      credit.className = 'media-credit';
-      credit.textContent = item.credit || animalPhoto.credit;
-      card.append(credit);
-    }
 
     card.onclick = () => onPick(item, card);
     grid.appendChild(card);
@@ -1537,6 +1530,27 @@ function renderParent() {
     '😊 Bercakap tentang perasaan';
 
   panel.appendChild(tips);
+
+  // Kredit sumber dikekalkan di bahagian ibu bapa supaya kad pembelajaran bersih.
+  const mediaSources = document.createElement('details');
+  mediaSources.className = 'setting';
+  mediaSources.style.display = 'block';
+  const mediaSummary = document.createElement('summary');
+  mediaSummary.textContent = '📷 Sumber gambar & bunyi haiwan';
+  mediaSummary.style.cursor = 'pointer';
+  mediaSummary.style.fontWeight = '800';
+  mediaSources.appendChild(mediaSummary);
+  const mediaList = document.createElement('ul');
+  mediaList.style.paddingLeft = '20px';
+  mediaList.style.lineHeight = '1.5';
+  ANIMALS.filter(animal => animal.credit).forEach(animal => {
+    const item = document.createElement('li');
+    item.style.margin = '8px 0';
+    item.textContent = animal.name + ' — ' + animal.credit;
+    mediaList.appendChild(item);
+  });
+  mediaSources.appendChild(mediaList);
+  panel.appendChild(mediaSources);
 }
 
 /* ---------------- INIT ---------------- */
