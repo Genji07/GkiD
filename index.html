@@ -500,6 +500,83 @@ body {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
 
+
+/* ---------------- PLAYFUL GAME EXPERIENCE ---------------- */
+.game-hud {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  width: 100%; margin: 0 auto 22px; padding: 12px 14px;
+  border: 1px solid #e5eee4; border-radius: 20px;
+  background: linear-gradient(110deg,#fff 0%,#f4fff7 100%);
+  box-shadow: 0 7px 20px rgba(38,70,52,.055); text-align: left;
+}
+.game-world-badge { display:flex; align-items:center; gap:10px; min-width:0; }
+.game-world-icon { display:grid; place-items:center; flex:0 0 48px; height:48px; border-radius:16px; background:#fff0d8; font-size:27px; }
+.game-world-badge small, .game-world-badge strong, .game-world-badge em { display:block; }
+.game-world-badge small { color:#8a9b90; font-size:9px; font-weight:900; letter-spacing:.08em; }
+.game-world-badge strong { font-size:14px; font-weight:950; margin-top:3px; }
+.game-world-badge em { color:#6b9a82; font-size:10px; font-style:normal; font-weight:800; margin-top:2px; }
+.game-question-info { width:min(34%,180px); min-width:86px; }
+.game-question-count { display:block; text-align:right; margin-bottom:7px; color:#6d8275; font-size:12px; font-weight:950; }
+.game-progress { height:8px; width:100%; overflow:hidden; border-radius:99px; background:#e9f0e8; }
+.game-progress-fill { display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#5ac9a2,#b0df76); transition:width .35s ease; }
+.game-question-body { width:100%; }
+.game-question-body > p:not(#feedback) {
+  display:table; max-width:100%; margin:16px auto; padding:11px 18px;
+  border:1px solid #e8eee4; border-radius:17px; background:#fff;
+  color:#304a3d; font-size:clamp(17px,4.5vw,22px); line-height:1.4;
+  box-shadow:0 5px 14px rgba(38,70,52,.045);
+}
+.game-question-body .big-pic {
+  display:grid; place-items:center; width:min(100%,360px); min-height:150px;
+  margin:15px auto; border:2px solid #fff; border-radius:28px;
+  background:linear-gradient(145deg,#fff5dc,#e9f8ee);
+  box-shadow:0 10px 26px rgba(38,70,52,.08);
+  animation:game-pop .38s ease both;
+}
+.game-question-body .photo-pic {
+  max-width:min(100%,360px); border:5px solid #fff;
+  background:linear-gradient(145deg,#fff5dc,#e9f8ee);
+}
+.game-question-body .grid { margin-top:20px; }
+.game-question-body .card {
+  position:relative; min-height:140px; border-radius:23px;
+  background:linear-gradient(160deg,#fff 65%,#f8fbf5);
+}
+.game-question-body .card .pic { transition:transform .2s ease; }
+.game-question-body .card:active .pic { transform:scale(1.08); }
+.game-question-body .card.correct {
+  border-color:#52c59a; background:linear-gradient(145deg,#f2fff8,#dff8e9);
+  animation:answer-correct .42s ease;
+}
+.game-question-body .card.wrong { animation:answer-wrong .3s ease; }
+.game-feedback {
+  min-height:26px; margin:18px auto 0; padding:0 8px;
+  color:#309a70; font-size:16px; font-weight:950; text-align:center;
+}
+.game-feedback:not(:empty) {
+  display:table; max-width:100%; padding:10px 16px; border-radius:15px;
+  background:#e8faef; animation:game-pop .25s ease both;
+}
+#activityContent.question-enter { animation:game-enter .3s ease both; }
+#activityContent .btn { min-width:145px; }
+@keyframes game-enter { from {opacity:0; transform:translateY(8px)} to {opacity:1;transform:translateY(0)} }
+@keyframes game-pop { from {opacity:0;transform:scale(.94)} to {opacity:1;transform:scale(1)} }
+@keyframes answer-correct { 45% {transform:scale(1.035)} 100% {transform:scale(1)} }
+@keyframes answer-wrong { 25%,75% {transform:translateX(-3px)} 50% {transform:translateX(3px)} }
+@media(max-width:390px) {
+  .game-hud { padding:10px; gap:8px; }
+  .game-world-icon { flex-basis:40px; height:40px; font-size:23px; border-radius:13px; }
+  .game-world-badge strong { font-size:12px; }
+  .game-world-badge small { font-size:8px; }
+  .game-question-info { min-width:72px; }
+  .game-question-body .card { min-height:110px; padding:12px 6px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #activityContent.question-enter, .game-question-body .big-pic,
+  .game-feedback:not(:empty), .game-question-body .card.correct,
+  .game-question-body .card.wrong { animation:none; }
+}
+
 </style>
 </head>
 
@@ -1138,17 +1215,42 @@ function nextActivity() {
 function makeQuestion() {
   const el = document.getElementById('activityContent');
   el.innerHTML = '';
+  el.classList.remove('question-enter');
+  void el.offsetWidth;
+  el.classList.add('question-enter');
 
-  const heading = document.createElement('h2');
-  heading.textContent = WORLDS[state.world].name;
+  const world = WORLDS[state.world];
+  const hud = document.createElement('div');
+  hud.className = 'game-hud';
 
-  const number = document.createElement('p');
-  number.textContent =
-    'Soalan ' + state.question + ' daripada ' + state.totalQuestions;
+  const worldBadge = document.createElement('div');
+  worldBadge.className = 'game-world-badge';
+  worldBadge.innerHTML = '<span class="game-world-icon" aria-hidden="true">' +
+    world.icon + '</span><span><small>DUNIA PEMBELAJARAN</small><strong>' +
+    world.name + '</strong><em>Level ' + state.level + '</em></span>';
 
-  el.append(heading, number);
+  const questionInfo = document.createElement('div');
+  questionInfo.className = 'game-question-info';
+  const number = document.createElement('span');
+  number.className = 'game-question-count';
+  number.textContent = state.question + ' / ' + state.totalQuestions;
+  const progress = document.createElement('div');
+  progress.className = 'game-progress';
+  progress.setAttribute('role', 'progressbar');
+  progress.setAttribute('aria-label', 'Kemajuan soalan');
+  progress.setAttribute('aria-valuemin', '0');
+  progress.setAttribute('aria-valuemax', String(state.totalQuestions));
+  progress.setAttribute('aria-valuenow', String(state.question));
+  const fill = document.createElement('span');
+  fill.className = 'game-progress-fill';
+  fill.style.width = (state.question / state.totalQuestions * 100) + '%';
+  progress.appendChild(fill);
+  questionInfo.append(number, progress);
+  hud.append(worldBadge, questionInfo);
+  el.appendChild(hud);
 
   const content = document.createElement('div');
+  content.className = 'game-question-body';
   el.appendChild(content);
 
   const key = state.world;
@@ -1165,6 +1267,7 @@ function makeQuestion() {
 
   const hint = document.createElement('p');
   hint.id = 'feedback';
+  hint.className = 'game-feedback';
   hint.setAttribute('aria-live', 'polite');
   content.appendChild(hint);
 }
