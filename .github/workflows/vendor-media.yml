@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/vendor-media.yml'
+      - 'index.html'
   workflow_dispatch:
 permissions:
   contents: write
