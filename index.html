@@ -327,6 +327,179 @@ body.no-animation *::after {
   .card { min-height: 88px; padding: 9px 3px; }
   .btn { padding: 14px 18px; }
 }
+
+/* ---------------- GkiD VISUAL REDESIGN ---------------- */
+:root {
+  --bg: #f7f8f1;
+  --primary: #ff795b;
+  --secondary: #59bfa5;
+  --accent: #ffd66b;
+  --text: #243b35;
+  --ok: #25a879;
+  --bad: #e75d65;
+  --ink-soft: #63756f;
+  --line: #e8eee6;
+  --shadow-soft: 0 18px 50px rgba(44, 73, 61, .09);
+}
+html { background: var(--bg); }
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 8% 5%, rgba(255, 219, 153, .24), transparent 32%),
+    radial-gradient(ellipse at 95% 38%, rgba(164, 226, 204, .22), transparent 34%),
+    var(--bg);
+  color: var(--text);
+  letter-spacing: -.01em;
+}
+#app { max-width: 1180px; margin: 0 auto; padding: 18px clamp(12px, 3vw, 34px); }
+.screen { min-height: calc(100dvh - 36px); padding: 76px 6px 34px; }
+.screen h2 { color: var(--text); font-size: clamp(27px, 5vw, 38px); letter-spacing: -.04em; }
+.screen > p { color: var(--ink-soft); max-width: 620px; }
+.btn {
+  border-radius: 17px; padding: 16px 23px; min-height: 56px;
+  background: var(--primary); box-shadow: 0 5px 0 #d65e43;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.btn.secondary { background: var(--secondary); box-shadow: 0 5px 0 #379a82; }
+.btn.light { background: #fff; color: var(--text); box-shadow: 0 4px 0 #e3e9e2; border: 1px solid var(--line); }
+.btn:hover { filter: brightness(1.025); transform: translateY(-2px); }
+.btn:active { transform: translateY(2px) scale(.985); box-shadow: 0 2px 0 #d65e43; }
+.grid { gap: 14px; max-width: 780px; }
+.card {
+  min-height: 130px; padding: 16px 10px; gap: 9px;
+  border: 2px solid rgba(226, 236, 226, .8); border-radius: 22px;
+  background: rgba(255,255,255,.94); box-shadow: 0 8px 24px rgba(41, 68, 56, .06);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(41, 68, 56, .11); }
+.card.correct { border-color: var(--ok); background: #f0fff8; }
+.card.wrong { border-color: var(--bad); background: #fff5f5; }
+.pic { font-size: clamp(42px, 9vw, 64px); }
+.photo-pic { border-radius: 25px; box-shadow: 0 14px 32px rgba(40, 66, 54, .12); }
+.card .photo-pic { border-radius: 15px; }
+.label { font-size: clamp(14px, 3.3vw, 17px); line-height: 1.25; }
+.age-button {
+  width: 100%; border: 2px solid var(--line); border-radius: 20px;
+  background: white; box-shadow: 0 6px 0 #e5ebe3; color: var(--text);
+  transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+.age-button:hover { transform: translateY(-2px); border-color: #ffb3a2; }
+.age-button.selected { background: var(--primary); color: white; border-color: var(--primary); }
+#ageGrid { max-width: 680px; }
+#worldGrid { max-width: 900px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.world-card {
+  display: grid; grid-template-columns: 68px minmax(0,1fr) 22px; align-items: center;
+  text-align: left; gap: 13px; min-height: 128px; padding: 16px;
+}
+.world-card.recommended { border-color: #68c9ad; background: linear-gradient(135deg, #fff 30%, #effcf5); }
+.world-icon {
+  display: grid; place-items: center; width: 64px; height: 64px;
+  border-radius: 21px; font-size: 35px; background: #fff0dc;
+}
+.world-tone-1 { background: #e4f4ff; } .world-tone-2 { background: #fff0bf; }
+.world-tone-3 { background: #e3f7e9; } .world-tone-4 { background: #f0e8ff; }
+.world-tone-5 { background: #ffe7e2; } .world-tone-6 { background: #e2f6f1; }
+.world-tone-7 { background: #fbe8f4; }
+.world-card-copy { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
+.world-card .label { font-size: 17px; }
+.world-description { color: var(--ink-soft); font-size: 12px; line-height: 1.35; font-weight: 600; }
+.world-meta { color: #598f7b; font-size: 10px; font-weight: 800; }
+.world-progress, .level-progress { display: block; width: 100%; height: 5px; background: #edf2ed; border-radius: 20px; overflow: hidden; }
+.world-progress-fill, .level-progress span { display: block; height: 100%; background: #65c6a6; border-radius: inherit; }
+.world-arrow { color: #9ab5a7; font-size: 28px; font-weight: 800; }
+#levels .grid { max-width: 720px; }
+.level-card { position: relative; min-height: 188px; }
+.level-number { position: absolute; top: 12px; left: 13px; font-size: 11px; color: #8b9b92; font-weight: 900; letter-spacing: .08em; }
+.level-medal { font-size: 43px; margin-top: 8px; }
+.level-subtitle { color: var(--ink-soft); font-size: 12px; font-weight: 700; }
+.level-count { color: #71847a; font-size: 11px; font-weight: 750; }
+.level-complete { border-color: #6bc6a6; background: linear-gradient(160deg,#fff,#f1fff7); }
+.top .round { border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(35,59,49,.12); }
+.counter { background: white; border: 1px solid var(--line); color: #b87a10; box-shadow: 0 6px 18px rgba(35,59,49,.08); }
+#activityContent { max-width: 760px; background: rgba(255,255,255,.74); border: 1px solid rgba(227,235,226,.8); border-radius: 28px; padding: clamp(16px,4vw,30px); box-shadow: var(--shadow-soft); }
+#activityContent > h2 { margin-top: 2px; }
+#activityContent .grid { margin-top: 20px; }
+.reward { background: rgba(247,248,241,.97); backdrop-filter: blur(12px); }
+.reward-pic { filter: drop-shadow(0 12px 14px rgba(60,90,70,.12)); }
+.setting { border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(35,59,49,.04); border-radius: 18px; }
+#toast { border-radius: 15px; box-shadow: 0 8px 25px rgba(0,0,0,.16); }
+.home-screen { justify-content: flex-start; padding-top: 8px; }
+.home-shell { width: 100%; max-width: 1050px; margin: 0 auto; }
+.brand-row { display: flex; align-items: center; gap: 11px; margin: 0 0 clamp(25px,5vw,54px); }
+.brand-mark { width: 47px; height: 47px; display: grid; place-items: center; background: #243b35; color: #fff; border-radius: 16px 16px 16px 5px; font-size: 27px; font-weight: 950; box-shadow: 0 6px 0 #c5d9cb; }
+.brand-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.brand-copy strong { font-size: 22px; font-weight: 950; letter-spacing: -.06em; }
+.brand-copy span { font-size: 11px; color: var(--ink-soft); font-weight: 700; }
+.home-stars { margin-left: auto; border: 1px solid #f0e4c4; background: #fffdf4; border-radius: 18px; padding: 10px 15px; font-size: 14px; font-weight: 900; color: #9a741c; }
+.hero-layout { display: grid; grid-template-columns: 1.03fr .97fr; align-items: center; gap: clamp(12px,4vw,55px); }
+.hero-copy { text-align: left; padding: 0 0 10px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #dcebe0; border-radius: 30px; background: rgba(255,255,255,.76); color: #56836f; font-size: 11px; font-weight: 850; letter-spacing: .02em; }
+.eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #5cc59f; box-shadow: 0 0 0 4px #dff7e9; }
+.hero-copy h1 { margin: 21px 0 17px; color: #243b35; font-size: clamp(44px,7vw,76px); line-height: .99; letter-spacing: -.075em; font-weight: 950; }
+.hero-copy h1 em { color: #ff795b; font-style: normal; }
+.hero-description { color: #667970; max-width: 470px; font-size: clamp(15px,1.8vw,18px); line-height: 1.7; margin: 0 0 24px; }
+.hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 11px; }
+.hero-actions .btn { margin: 0; min-height: 56px; }
+.hero-start { display: inline-flex; align-items: center; justify-content: center; gap: 17px; }
+.parent-start { font-size: 14px; }
+.hero-trust { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 21px; color: #7c8b81; font-size: 10px; font-weight: 750; }
+.hero-trust span { color: #3da783; font-weight: 950; }
+.hero-art { min-height: 350px; position: relative; display: grid; place-items: center; isolation: isolate; border-radius: 42% 42% 32% 32%; background: linear-gradient(145deg,#fff1ce 0%,#fbe7e1 45%,#e5f7eb 100%); overflow: hidden; }
+.hero-art::before { content: ""; position: absolute; inset: 20px; border: 1px dashed rgba(87,133,109,.25); border-radius: 44% 44% 30% 30%; z-index: -1; }
+.mascot-svg { width: min(100%, 350px); height: auto; position: relative; z-index: 2; filter: drop-shadow(0 12px 7px rgba(43,73,57,.08)); }
+.art-sun { position: absolute; width: 66px; height: 66px; top: 25px; right: 40px; border-radius: 50%; background: #ffd66b; box-shadow: 0 0 0 12px rgba(255,214,107,.18); }
+.art-cloud { position: absolute; width: 64px; height: 20px; background: rgba(255,255,255,.88); border-radius: 30px; }
+.art-cloud::before, .art-cloud::after { content: ""; position: absolute; bottom: 5px; border-radius: 50%; background: inherit; }
+.art-cloud::before { width: 28px; height: 28px; left: 10px; }
+.art-cloud::after { width: 22px; height: 22px; right: 8px; }
+.cloud-one { left: 24px; top: 77px; }.cloud-two { right: 23px; top: 150px; transform: scale(.7); }
+.art-spark { position: absolute; color: #e5a83d; font-size: 25px; animation: twinkle 2.6s ease-in-out infinite; }
+.spark-one { top: 125px; left: 38px; }.spark-two { right: 32px; top: 50px; animation-delay: .8s; }
+.art-caption { position: absolute; z-index: 3; bottom: 17px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; white-space: nowrap; background: rgba(255,255,255,.93); padding: 11px 17px; border: 1px solid rgba(255,255,255,.9); border-radius: 18px; box-shadow: 0 10px 25px rgba(44,73,61,.12); }
+.caption-icon { width: 33px; height: 33px; display: grid; place-items: center; border-radius: 12px; background: #fff2c9; color: #b98218; font-size: 22px; }
+.art-caption strong, .art-caption small { display: block; text-align: left; }
+.art-caption strong { font-size: 12px; }.art-caption small { margin-top: 2px; font-size: 10px; color: #72847a; }
+.home-bottom { margin: clamp(28px,5vw,55px) 0 12px; padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border: 1px solid #e4ece2; border-radius: 22px; background: rgba(255,255,255,.65); }
+.bottom-heading { display: flex; align-items: center; gap: 11px; text-align: left; }
+.bottom-heading > span { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 14px; background: #e5f7ed; font-size: 22px; }
+.bottom-heading strong, .bottom-heading small { display: block; }
+.bottom-heading strong { font-size: 13px; }.bottom-heading small { margin-top: 4px; font-size: 11px; color: #788980; }
+.mini-worlds { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; }
+.mini-worlds span { padding: 8px 10px; border-radius: 12px; background: #f5f7ef; border: 1px solid #e9eee3; color: #53695e; font-size: 10px; font-weight: 800; }
+@keyframes twinkle { 0%,100% { transform: scale(1) rotate(0); opacity: .7; } 50% { transform: scale(1.2) rotate(12deg); opacity: 1; } }
+@media (max-width: 760px) {
+  #app { padding: 12px 13px; }
+  .home-screen { padding-top: 4px; }
+  .brand-row { margin-bottom: 25px; }
+  .hero-layout { grid-template-columns: 1fr; gap: 22px; }
+  .hero-copy { padding: 0 4px; }
+  .hero-copy h1 { font-size: clamp(47px,12vw,70px); margin-top: 18px; }
+  .hero-description { max-width: 560px; }
+  .hero-art { width: min(100%, 450px); min-height: 310px; margin: 0 auto; }
+  .mascot-svg { max-height: 300px; }
+  .home-bottom { flex-direction: column; align-items: flex-start; }
+  .mini-worlds { justify-content: flex-start; }
+  #worldGrid { grid-template-columns: 1fr; }
+  .world-card { min-height: 116px; }
+  .screen { padding-top: 72px; }
+}
+@media (max-width: 390px) {
+  .hero-art { min-height: 275px; }
+  .mascot-svg { max-height: 270px; }
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .btn { width: 100%; }
+  .hero-trust { gap: 6px; font-size: 9px; }
+  .home-bottom { padding: 15px; }
+  .world-card { grid-template-columns: 53px minmax(0,1fr) 15px; padding: 12px; gap: 10px; }
+  .world-icon { width: 51px; height: 51px; font-size: 28px; border-radius: 16px; }
+  .world-card .label { font-size: 15px; }
+  .world-description { font-size: 11px; }
+  .g3 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
 </style>
 </head>
 
@@ -339,13 +512,59 @@ body.no-animation *::after {
     <button class="round" onclick="repeatInstruction()" aria-label="Ulang suara">🔊</button>
   </div>
 
-  <section class="screen active" id="home">
-    <h1>🎨 GkiD</h1>
-    <h2>Belajar Sambil Bermain</h2>
-    <div class="big-pic">🧒🏻🌈🧸</div>
-    <p>Jom belajar, bermain dan kumpul bintang!</p>
-    <button class="btn" onclick="showScreen('ages')">🚀 Mula Main</button>
-    <button class="btn secondary" onclick="parentGate()">👨‍👩‍👧 Ibu Bapa</button>
+  <section class="screen active home-screen" id="home">
+    <div class="home-shell">
+      <header class="brand-row">
+        <div class="brand-mark" aria-hidden="true">G</div>
+        <div class="brand-copy"><strong>GkiD</strong><span>Belajar sambil bermain</span></div>
+        <div class="home-stars" aria-label="Jumlah bintang">⭐ <span id="homeStarCount">0</span></div>
+      </header>
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-dot"></span> Ruang kecil untuk ilmu besar</div>
+          <h1>Jom belajar,<br><em>jom teroka!</em></h1>
+          <p class="hero-description">Permainan ceria untuk kenal haiwan, huruf, nombor, warna dan emosi — satu langkah kecil setiap hari.</p>
+          <div class="hero-actions">
+            <button class="btn hero-start" onclick="showScreen('ages')"><span>Mula pengembaraan</span><span aria-hidden="true">➜</span></button>
+            <button class="btn light parent-start" onclick="parentGate()">Untuk ibu bapa</button>
+          </div>
+          <div class="hero-trust"><span>✓</span> Aktiviti ringkas <span>✓</span> Bahasa Melayu <span>✓</span> Mesra telefon</div>
+        </div>
+        <div class="hero-art" aria-label="Ilustrasi taman pembelajaran" role="img">
+          <div class="art-spark spark-one">✦</div><div class="art-spark spark-two">✦</div>
+          <div class="art-sun"></div><div class="art-cloud cloud-one"></div><div class="art-cloud cloud-two"></div>
+          <svg class="mascot-svg" viewBox="0 0 360 340" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="181" cy="302" rx="125" ry="18" fill="#B9DCC7" opacity=".55"/>
+            <path d="M39 273 Q73 221 126 253 T232 246 T323 267 L323 310 L39 310Z" fill="#B7E3C6"/>
+            <path d="M69 292 Q93 250 143 278 T250 276 T302 289 L302 310 L69 310Z" fill="#87CFA9"/>
+            <g transform="translate(62 35)">
+              <path d="M64 65 Q32 5 4 39 Q-3 71 42 91Z" fill="#F6B7A5" stroke="#263D36" stroke-width="5" stroke-linejoin="round"/>
+              <path d="M151 65 Q183 5 211 39 Q218 71 173 91Z" fill="#F6B7A5" stroke="#263D36" stroke-width="5" stroke-linejoin="round"/>
+              <path d="M38 84 Q25 34 78 21 Q108 10 138 23 Q183 40 177 99 L166 153 Q145 190 104 190 Q59 188 39 151Z" fill="#FFD8B5" stroke="#263D36" stroke-width="5" stroke-linejoin="round"/>
+              <path d="M36 88 Q15 42 60 22 Q95 -2 131 17 Q160 25 177 59 Q151 47 129 51 Q87 59 36 88Z" fill="#5B493F" stroke="#263D36" stroke-width="5" stroke-linejoin="round"/>
+              <ellipse cx="76" cy="105" rx="6" ry="9" fill="#263D36"/><ellipse cx="139" cy="105" rx="6" ry="9" fill="#263D36"/>
+              <circle cx="61" cy="124" r="10" fill="#F49D91" opacity=".7"/><circle cx="153" cy="124" r="10" fill="#F49D91" opacity=".7"/>
+              <path d="M91 129 Q107 144 124 129" fill="none" stroke="#263D36" stroke-width="4" stroke-linecap="round"/>
+              <path d="M49 178 Q104 157 161 178 L181 255 L31 255Z" fill="#5A9BE8" stroke="#263D36" stroke-width="5" stroke-linejoin="round"/>
+              <path d="M57 184 L26 220 Q19 232 31 239 Q42 244 49 231 L77 204" fill="#FFD8B5" stroke="#263D36" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M154 185 L180 216 Q190 228 180 237 Q169 244 160 231 L139 205" fill="#FFD8B5" stroke="#263D36" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M63 254 L58 277 Q57 290 72 290 L94 290 Q105 288 101 277 L96 254Z" fill="#F2B56B" stroke="#263D36" stroke-width="5"/>
+              <path d="M116 254 L112 277 Q110 290 126 290 L148 290 Q159 288 155 277 L149 254Z" fill="#F2B56B" stroke="#263D36" stroke-width="5"/>
+              <path d="M81 191 L106 213 L132 191" fill="#FFFFFF" opacity=".95"/>
+              <circle cx="105" cy="218" r="7" fill="#FFD65A" stroke="#263D36" stroke-width="3"/>
+            </g>
+            <g transform="translate(12 204)"><circle cx="22" cy="22" r="22" fill="#FFF0B3"/><text x="22" y="31" font-size="26" text-anchor="middle">A</text></g>
+            <g transform="translate(275 191)"><circle cx="24" cy="24" r="24" fill="#D5CCFF"/><text x="24" y="33" font-size="28" text-anchor="middle">★</text></g>
+            <g transform="translate(261 88)"><circle cx="18" cy="18" r="18" fill="#FFD1C7"/><text x="18" y="25" font-size="22" text-anchor="middle">♥</text></g>
+          </svg>
+          <div class="art-caption"><span class="caption-icon">✧</span><span><strong>Hebatnya kamu!</strong><small>Setiap cubaan itu kemajuan.</small></span></div>
+        </div>
+      </div>
+      <div class="home-bottom">
+        <div class="bottom-heading"><span>🌈</span><div><strong>8 dunia untuk diteroka</strong><small>Belajar ikut rentak sendiri</small></div></div>
+        <div class="mini-worlds"><span>🐾 Haiwan</span><span>🔤 ABC</span><span>🔢 Nombor</span><span>😊 Emosi</span><span>🧩 Corak</span></div>
+      </div>
+    </div>
   </section>
 
   <section class="screen" id="ages">
@@ -763,8 +982,10 @@ function showScreen(id, renderParentSettings = true) {
 }
 
 function updateCounter() {
-  document.getElementById('progressCounter').textContent =
-    '⭐ ' + state.stars;
+  const counter = document.getElementById('progressCounter');
+  if (counter) counter.textContent = '⭐ ' + state.stars;
+  const homeCount = document.getElementById('homeStarCount');
+  if (homeCount) homeCount.textContent = state.stars;
 }
 
 function toast(message) {
@@ -818,23 +1039,35 @@ function renderAges() {
 
 function renderWorlds() {
   document.getElementById('ageInfo').textContent =
-    'Umur dipilih: ' + AGES[state.age].label;
+    'Umur dipilih: ' + AGES[state.age].label + ' · Pilih dunia yang ingin diteroka.';
 
+  const descriptions = {
+    sensory: 'Kenal haiwan, gambar dan bunyi.',
+    match: 'Padankan warna, haiwan dan bentuk.',
+    count: 'Kira objek satu demi satu.',
+    compare: 'Banding banyak, sedikit dan saiz.',
+    word: 'Kenal perkataan dan mula mengeja.',
+    abc: 'Teroka huruf A hingga Z.',
+    emotion: 'Kenal dan fahami perasaan.',
+    pattern: 'Cari corak dan bentuk yang sama.'
+  };
   const grid = document.getElementById('worldGrid');
   grid.innerHTML = '';
 
-  Object.entries(WORLDS).forEach(([key, world]) => {
+  Object.entries(WORLDS).forEach(([key, world], index) => {
     const card = document.createElement('button');
-    card.className = 'card';
-
-    if (key === AGES[state.age].recommended) {
-      card.style.borderColor = 'var(--secondary)';
-    }
-
+    card.className = 'card world-card';
+    const recommended = key === AGES[state.age].recommended;
+    if (recommended) card.classList.add('recommended');
+    const completed = [1, 2, 3].filter(level => (state.progress[key + '_' + level] || 0) >= 5).length;
     card.innerHTML =
-      `<span class="pic">${world.icon}</span>
-       <span class="label">${world.name}</span>`;
-
+      `<span class="world-icon world-tone-${index % 8}">${world.icon}</span>
+       <span class="world-card-copy"><span class="label">${world.name}</span>
+       <span class="world-description">${descriptions[key]}</span>
+       <span class="world-progress"><span class="world-progress-fill" style="width:${completed / 3 * 100}%"></span></span>
+       <span class="world-meta">${recommended ? '✦ Disyorkan untuk umur ini' : 'Dunia ' + (index + 1)} · ${completed}/3 tahap selesai</span></span>
+       <span class="world-arrow" aria-hidden="true">›</span>`;
+    card.setAttribute('aria-label', world.name + '. ' + descriptions[key]);
     card.onclick = () => renderLevels(key);
     grid.appendChild(card);
   });
@@ -843,23 +1076,23 @@ function renderWorlds() {
 function renderLevels(key) {
   state.world = key;
 
-  document.getElementById('levelHeading').textContent =
-    WORLDS[key].name;
-
+  document.getElementById('levelHeading').textContent = WORLDS[key].name;
   const grid = document.getElementById('levelGrid');
   grid.innerHTML = '';
 
+  const levelNames = ['Mula belajar', 'Cuba lagi', 'Jadi juara'];
   [1, 2, 3].forEach(level => {
     const card = document.createElement('button');
-    card.className = 'card';
-
-    const done = state.progress[key + '_' + level] || 0;
-
+    card.className = 'card level-card';
+    const done = Math.min(state.progress[key + '_' + level] || 0, 5);
+    if (done >= 5) card.classList.add('level-complete');
     card.innerHTML =
-      `<span class="pic">${['🥚','🐣','🏆'][level-1]}</span>
-       <span class="label">Level ${level}</span>
-       <span class="label">${Math.min(done, 5)}/5 selesai</span>`;
-
+      `<span class="level-number">0${level}</span>
+       <span class="level-medal">${['🌱','🚀','🏆'][level-1]}</span>
+       <span class="label">Tahap ${level}</span>
+       <span class="level-subtitle">${levelNames[level-1]}</span>
+       <span class="level-progress"><span style="width:${done / 5 * 100}%"></span></span>
+       <span class="level-count">${done}/5 soalan selesai</span>`;
     card.onclick = () => startLevel(key, level);
     grid.appendChild(card);
   });
