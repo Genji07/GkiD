@@ -783,7 +783,20 @@ function cardGrid(content, items, onPick, columns = 3) {
 function answer(correct, selected, card, feedback = 'Betul!') {
   if (state.answered) return;
 
-  if (selected !== correct) {
+  // Bandingkan pilihan berdasarkan kandungan, bukan rujukan objek sahaja.
+  // Ini penting untuk kad ABC/perkataan yang dibina daripada salinan objek.
+  const sameChoice = selected === correct || (
+    selected != null && correct != null &&
+    typeof selected === 'object' && typeof correct === 'object' &&
+    (
+      (selected.letter != null && selected.letter === correct.letter) ||
+      (selected.word != null && selected.word === correct.word) ||
+      (selected.name != null && selected.name === correct.name &&
+        selected.icon != null && selected.icon === correct.icon)
+    )
+  );
+
+  if (!sameChoice) {
     card.classList.add('wrong');
     speak('Cuba lagi.');
     const f = document.getElementById('feedback');
