@@ -49,6 +49,8 @@ p{font-size:clamp(16px,4vw,22px);line-height:1.5;margin-bottom:12px;max-width:60
 .switch.on{background:var(--secondary)}
 .switch::after{content:'';position:absolute;top:3px;left:3px;width:28px;height:28px;background:#fff;border-radius:50%;transition:transform .2s}
 .switch.on::after{transform:translateX(26px)}
+/* Tambahan untuk ABC */
+.abc-big{font-size:clamp(80px,25vw,150px);font-weight:900;color:var(--primary);line-height:1;margin:10px 0}
 </style>
 </head>
 <body>
@@ -82,7 +84,7 @@ p{font-size:clamp(16px,4vw,22px);line-height:1.5;margin-bottom:12px;max-width:60
   </div>
 
   <div class="screen" id="screen-level">
-    <h2 id="levelTitle">Pilih Aktiviti</h2>
+    <h2 id="levelTitle">Pilih Level</h2>
     <div class="grid g3" id="levelGrid"></div>
     <button class="btn secondary small" onclick="goTo('world')">Kembali</button>
   </div>
@@ -115,6 +117,8 @@ const state = {
   age: null, 
   currentWorld: null,
   currentLevel: 1,
+  questionNumber: 1, // Kira soalan ke berapa dalam 1 level
+  maxQuestions: 5,   // Setiap level ada 5 soalan
   stars: parseInt(localStorage.getItem('gkid_stars')||'0',10),
   soundOn: localStorage.getItem('gkid_sound')!=='off',
   animOn: localStorage.getItem('gkid_anim')!=='off',
@@ -134,6 +138,7 @@ const WORLDS = {
   count:{emoji:'🔢',name:'Kira Objek'},
   compare:{emoji:'⚖️',name:'Banding Saiz'},
   word:{emoji:'📝',name:'Baca & Eja'},
+  abc:{emoji:'🔤',name:'Kenal ABC'}, // DUNIA BARU
   emotion:{emoji:'😊',name:'Dunia Emosi'},
   pattern:{emoji:'🧩',name:'Corak & Bentuk'}
 };
@@ -162,6 +167,13 @@ const WORDS = [
   {word:'BOLA',emoji:'⚽'},{word:'BUKU',emoji:'📕'},
   {word:'AYAM',emoji:'🐔'},{word:'BUNGA',emoji:'🌸'}
 ];
+
+// ABC (A sampai Z) - Fasa 1: A-E, Fasa 2: F-J, Fasa 3: K-O (boleh tambah sehingga Z)
+const ALPHABETS = {
+  1: [{l:'A', e:'🍎', n:'Apple'}, {l:'B', e:'⚽', n:'Bola'}, {l:'C', e:'🐱', n:'Cat'}, {l:'D', e:'🍩', n:'Donut'}, {l:'E', e:'🐘', n:'Gajah'}],
+  2: [{l:'F', e:'🐟', n:'Fish'}, {l:'G', e:'🍇', n:'Grapes'}, {l:'H', e:'🏠', n:'House'}, {l:'I', e:'🍦', n:'Ice Cream'}, {l:'J', e:'✈️', n:'Jet'}],
+  3: [{l:'K', e:'🐱', n:'Kucing'}, {l:'L', e:'🍋', n:'Lemon'}, {l:'M', e:'🥭', n:'Mangga'}, {l:'N', e:'🍍', n:'Nanas'}, {l:'O', e:'🐙', n:'Octopus'}]
+};
 
 function speak(text, audioFilename, cb) {
   if (!state.soundOn) { if(cb) cb(); return; }
@@ -216,18 +228,33 @@ function closeReward(){
   if(cb)cb();
 }
 
-// --- FUNGSI KEMAJUAN (PROGRESSION) ---
-function nextActivity() {
-  if (state.currentLevel < 3) {
-    startActivity(state.currentWorld, state.currentLevel + 1);
+// --- LOGIK KEMAJUAN (5 SOALAN PER LEVEL) ---
+function nextQuestion() {
+  state.questionNumber++;
+  
+  if (state.questionNumber <= state.maxQuestions) {
+    // Masih ada soalan dalam level yang sama, jana soalan baru
+    startActivity(state.currentWorld, state.currentLevel, false);
   } else {
-    // Habis 3 aktiviti, balik ke menu dunia
-    state.currentWorld = null;
-    state.currentLevel = 1;
-    goTo('world');
+    // Level tamat!
+    if (state.currentLevel < 3) {
+      showReward('🎉', 'Hebat! Naik Level!', 'level_up.mp3', () => {
+        state.currentLevel++;
+        state.questionNumber = 1;
+        startActivity(state.currentWorld, state.currentLevel, true);
+      });
+    } else {
+      // Semua 3 level tamat
+      showReward('🏆', 'Hebat! Dunia Selesai!', 'game_win.mp3', () => {
+        state.currentWorld = null;
+        state.currentLevel = 1;
+        state.questionNumber = 1;
+        goTo('world');
+      });
+    }
   }
 }
-// -------------------------------------
+// -------------------------------------------
 
 function buildAgePicker(){
   const p=document.getElementById('agePicker');p.innerHTML='';
@@ -261,20 +288,22 @@ function showLevelSelect(worldKey) {
   const g = document.getElementById('levelGrid'); g.innerHTML = '';
   [1, 2, 3].forEach(num => {
     const c = document.createElement('div'); c.className = 'card';
-    c.innerHTML = `<div style="font-size:clamp(36px,8vw,52px)">${num}️⃣</div><div class="label">Aktiviti ${num}</div>`;
-    c.onclick = () => startActivity(worldKey, num);
+    c.innerHTML = `<div style="font-size:clamp(36px,8vw,52px)">${num}️⃣</div><div class="label">Level ${num}</div>`;
+    c.onclick = () => startActivity(worldKey, num, true);
     g.appendChild(c);
   });
   goTo('level');
 }
 
-function startActivity(key, level) {
+function startActivity(key, level, resetQuestion = true) {
   state.currentWorld = key;
   state.currentLevel = level;
+  if (resetQuestion) state.questionNumber = 1;
+  
   goTo('activity');
   const fnName = `run_${key}_${level}`;
   if (typeof window[fnName] === 'function') {
-    window[fnName]();
+    window[fnName](state.questionNumber);
   } else {
     document.getElementById('activityContent').innerHTML = '<p>Aktiviti belum sedia.</p>';
   }
@@ -303,7 +332,7 @@ function run_sensory_1(){
         state.activityData.tapped=true;
         setTimeout(()=>{
           state.activityData=null;
-          showReward(a.emoji,'Bagus! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3', nextActivity);
+          showReward(a.emoji,'Bagus! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3', nextQuestion);
         },800);
       }
     };
@@ -311,7 +340,6 @@ function run_sensory_1(){
   });
   speak('Sentuh haiwan!', 'sensory1_inst.mp3');
 }
-
 function run_sensory_2(){
   const el=document.getElementById('activityContent');
   const pick=[...COLORS].sort(()=>Math.random()-.5).slice(0,3);
@@ -328,7 +356,7 @@ function run_sensory_2(){
         state.activityData.tapped=true;
         setTimeout(()=>{
           state.activityData=null;
-          showReward('🎨','Bagus! Warna '+c.name,'reward_warna.mp3', nextActivity);
+          showReward('🎨','Bagus! Warna '+c.name,'reward_warna.mp3', nextQuestion);
         },800);
       }
     };
@@ -336,7 +364,6 @@ function run_sensory_2(){
   });
   speak('Sentuh bulatan warna!', 'sensory2_inst.mp3');
 }
-
 function run_sensory_3(){
   const el=document.getElementById('activityContent');
   const objs = [{n:'Bola',e:'⚽'}, {n:'Cawan',e:'🥤'}, {n:'Kucing',e:'🐱'}];
@@ -353,7 +380,7 @@ function run_sensory_3(){
         state.activityData.tapped=true;
         setTimeout(()=>{
           state.activityData=null;
-          showReward(o.e,'Bagus! '+o.n,'reward_objek.mp3', nextActivity);
+          showReward(o.e,'Bagus! '+o.n,'reward_objek.mp3', nextQuestion);
         },800);
       }
     };
@@ -378,14 +405,13 @@ function run_match_1(){
     card.onclick=()=>{
       if(c===target){
         card.classList.add('correct'); speak('Betul! '+c.name, 'color_'+c.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🎨','Betul! '+c.name,'reward_warna.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🎨','Betul! '+c.name,'reward_warna.mp3', nextQuestion); },500);
       }else{ card.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>card.classList.remove('wrong'),600); }
     };
     g.appendChild(card);
   });
   speak('Cari warna '+target.name, 'match1_inst.mp3');
 }
-
 function run_match_2(){
   const el=document.getElementById('activityContent');
   const target=ANIMALS[Math.floor(Math.random()*ANIMALS.length)];
@@ -399,14 +425,13 @@ function run_match_2(){
     card.onclick=()=>{
       if(a===target){
         card.classList.add('correct'); speak('Betul! '+a.name, 'animal_'+a.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(a.emoji,'Betul! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(a.emoji,'Betul! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3', nextQuestion); },500);
       }else{ card.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>card.classList.remove('wrong'),600); }
     };
     g.appendChild(card);
   });
   speak('Cari haiwan yang berbunyi '+target.sound, 'match2_inst.mp3');
 }
-
 function run_match_3(){
   const el=document.getElementById('activityContent');
   const target=SHAPES[Math.floor(Math.random()*SHAPES.length)];
@@ -420,7 +445,7 @@ function run_match_3(){
     card.onclick=()=>{
       if(s===target){
         card.classList.add('correct'); speak('Betul! '+s.name, 'shape_'+s.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('⭐','Betul!','reward_bentuk.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('⭐','Betul!','reward_bentuk.mp3', nextQuestion); },500);
       }else{ card.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>card.classList.remove('wrong'),600); }
     };
     g.appendChild(card);
@@ -449,14 +474,13 @@ function run_count_1(){
     c.onclick=()=>{
       if(v===n){
         c.classList.add('correct'); speak('Betul! '+n, 'num_'+n+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Berapa banyak '+a.name+'?', 'count1_inst.mp3');
 }
-
 function run_count_2(){
   const el=document.getElementById('activityContent');
   const n=Math.floor(Math.random()*5)+1;
@@ -473,14 +497,13 @@ function run_count_2(){
     c.onclick=()=>{
       if(v===n){
         c.classList.add('correct'); speak('Betul! '+n, 'num_'+n+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Kira bintang. Berapa banyak?', 'count2_inst.mp3');
 }
-
 function run_count_3(){
   const el=document.getElementById('activityContent');
   const n=Math.floor(Math.random()*4)+2;
@@ -498,7 +521,7 @@ function run_count_3(){
     c.onclick=()=>{
       if(v===n){
         c.classList.add('correct'); speak('Betul! '+n, 'num_'+n+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🍎','Betul! '+n,'reward_kira.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🍎','Betul! '+n,'reward_kira.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -524,14 +547,13 @@ function run_compare_1(){
     c.onclick=()=>{
       if(v===Math.max(a,b)){
         c.classList.add('correct'); speak('Betul! '+Math.max(a,b)+' lebih banyak', 'correct_more.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Mana lebih banyak?', 'compare1_inst.mp3');
 }
-
 function run_compare_2(){
   const el=document.getElementById('activityContent');
   let a=Math.floor(Math.random()*5)+2, b=Math.floor(Math.random()*5)+2;
@@ -546,14 +568,13 @@ function run_compare_2(){
     c.onclick=()=>{
       if(v===Math.min(a,b)){
         c.classList.add('correct'); speak('Betul! '+Math.min(a,b)+' lebih sedikit', 'correct_less.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Mana lebih sedikit?', 'compare2_inst.mp3');
 }
-
 function run_compare_3(){
   const el=document.getElementById('activityContent');
   const items = [{n:'Gajah',e:'🐘',s:'Besar'}, {n:'Semut',e:'🐜',s:'Kecil'}, {n:'Ikan',e:'🐟',s:'Kecil'}, {n:'Bangunan',e:'🏢',s:'Besar'}];
@@ -569,7 +590,7 @@ function run_compare_3(){
     c.onclick=()=>{
       if(v.s === 'Besar'){
         c.classList.add('correct'); speak('Betul! '+v.n+' besar', 'correct_big.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🐘','Betul!','reward_compare.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🐘','Betul!','reward_compare.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -610,7 +631,7 @@ function run_word_1(){
       if(l===expect){
         prog.push(l); b.style.opacity='0.3'; b.style.pointerEvents='none'; speak(l, 'letter_'+l.toLowerCase()+'.mp3'); render();
         if(prog.length===t.word.length){
-          setTimeout(()=>{ state.activityData=null; showReward('📝','Pandai! '+t.word,'reward_eja.mp3', nextActivity); },400);
+          setTimeout(()=>{ state.activityData=null; showReward('📝','Pandai! '+t.word,'reward_eja.mp3', nextQuestion); },400);
         }
       }else{
         b.style.border='3px solid var(--danger)'; speak('Cuba lagi', 'wrong.mp3');
@@ -621,7 +642,6 @@ function run_word_1(){
   });
   speak('Susun huruf untuk '+t.word.toLowerCase(), 'word1_inst.mp3');
 }
-
 function run_word_2(){
   const el=document.getElementById('activityContent');
   const t=WORDS[Math.floor(Math.random()*WORDS.length)];
@@ -644,14 +664,13 @@ function run_word_2(){
     c.onclick=()=>{
       if(l===firstLetter){
         c.classList.add('correct'); speak('Betul! '+firstLetter, 'letter_'+l.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Apakah huruf pertama untuk '+t.word, 'word2_inst.mp3');
 }
-
 function run_word_3(){
   const el=document.getElementById('activityContent');
   const t=WORDS[Math.floor(Math.random()*WORDS.length)];
@@ -669,7 +688,7 @@ function run_word_3(){
     c.onclick=()=>{
       if(w===t){
         c.classList.add('correct'); speak('Betul! '+t.word, 'word_'+t.word.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -679,7 +698,99 @@ function run_word_3(){
 
 
 /* ==================================================
-   DUNIA 6: EMOTION (UMUR 3-6)
+   DUNIA 6: ABC (HURUF A-Z)
+   ================================================== */
+function run_abc_1(qNum){
+  const el=document.getElementById('activityContent');
+  const letterData = ALPHABETS[1][qNum - 1] || ALPHABETS[1][0]; // Ambil huruf ikut nombor soalan (A-E)
+  
+  // Buat pilihan rawak (1 betul, 2 salah)
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const opts = new Set([letterData.l]);
+  while(opts.size < 3) opts.add(alphabet[Math.floor(Math.random()*26)]);
+  const choices = [...opts].sort(()=>Math.random()-.5);
+
+  state.activityData={instruction:'Cari huruf '+letterData.l, audio:'abc1_inst.mp3'};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Cari huruf ini:</p>
+    <div class="abc-big">${letterData.l}</div>
+    <div class="grid g3" id="ag"></div>`;
+  
+  const g=document.getElementById('ag');
+  choices.forEach(l=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div style="font-size:clamp(40px,12vw,64px);font-weight:900">${l}</div>`;
+    c.onclick=()=>{
+      if(l===letterData.l){
+        c.classList.add('correct'); speak('Betul! '+letterData.l+' untuk '+letterData.n, 'letter_'+l.toLowerCase()+'.mp3');
+        setTimeout(()=>{ state.activityData=null; showReward(letterData.e,'Hebat!','reward_abc.mp3', nextQuestion); },500);
+      }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
+    };
+    g.appendChild(c);
+  });
+  speak('Cari huruf '+letterData.l, 'abc1_inst.mp3');
+}
+
+function run_abc_2(qNum){
+  const el=document.getElementById('activityContent');
+  const letterData = ALPHABETS[2][qNum - 1] || ALPHABETS[2][0]; // F-J
+  
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const opts = new Set([letterData.l]);
+  while(opts.size < 3) opts.add(alphabet[Math.floor(Math.random()*26)]);
+  const choices = [...opts].sort(()=>Math.random()-.5);
+
+  state.activityData={instruction:'Cari huruf '+letterData.l, audio:'abc2_inst.mp3'};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Cari huruf ini:</p>
+    <div class="abc-big">${letterData.l}</div>
+    <div class="grid g3" id="ag"></div>`;
+  
+  const g=document.getElementById('ag');
+  choices.forEach(l=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div style="font-size:clamp(40px,12vw,64px);font-weight:900">${l}</div>`;
+    c.onclick=()=>{
+      if(l===letterData.l){
+        c.classList.add('correct'); speak('Betul! '+letterData.l+' untuk '+letterData.n, 'letter_'+l.toLowerCase()+'.mp3');
+        setTimeout(()=>{ state.activityData=null; showReward(letterData.e,'Hebat!','reward_abc.mp3', nextQuestion); },500);
+      }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
+    };
+    g.appendChild(c);
+  });
+  speak('Cari huruf '+letterData.l, 'abc2_inst.mp3');
+}
+
+function run_abc_3(qNum){
+  const el=document.getElementById('activityContent');
+  const letterData = ALPHABETS[3][qNum - 1] || ALPHABETS[3][0]; // K-O
+  
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const opts = new Set([letterData.l]);
+  while(opts.size < 3) opts.add(alphabet[Math.floor(Math.random()*26)]);
+  const choices = [...opts].sort(()=>Math.random()-.5);
+
+  state.activityData={instruction:'Cari huruf '+letterData.l, audio:'abc3_inst.mp3'};
+  el.innerHTML=`<p style="font-weight:800;font-size:clamp(18px,4.5vw,24px)">Cari huruf ini:</p>
+    <div class="abc-big">${letterData.l}</div>
+    <div class="grid g3" id="ag"></div>`;
+  
+  const g=document.getElementById('ag');
+  choices.forEach(l=>{
+    const c=document.createElement('div'); c.className='card';
+    c.innerHTML=`<div style="font-size:clamp(40px,12vw,64px);font-weight:900">${l}</div>`;
+    c.onclick=()=>{
+      if(l===letterData.l){
+        c.classList.add('correct'); speak('Betul! '+letterData.l+' untuk '+letterData.n, 'letter_'+l.toLowerCase()+'.mp3');
+        setTimeout(()=>{ state.activityData=null; showReward(letterData.e,'Hebat!','reward_abc.mp3', nextQuestion); },500);
+      }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
+    };
+    g.appendChild(c);
+  });
+  speak('Cari huruf '+letterData.l, 'abc3_inst.mp3');
+}
+
+
+/* ==================================================
+   DUNIA 7: EMOTION (UMUR 3-6)
    ================================================== */
 function run_emotion_1(){
   const el=document.getElementById('activityContent');
@@ -694,14 +805,13 @@ function run_emotion_1(){
     c.onclick=()=>{
       if(e===target){
         c.classList.add('correct'); speak('Betul! '+e.name, 'emo_'+e.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(e.emoji,'Betul!','reward_emo.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(e.emoji,'Betul!','reward_emo.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Cari muka '+target.name, 'emo1_inst.mp3');
 }
-
 function run_emotion_2(){
   const el=document.getElementById('activityContent');
   const scenarios = [
@@ -725,14 +835,13 @@ function run_emotion_2(){
     c.onclick=()=>{
       if(emoji===target.emo){
         c.classList.add('correct'); speak('Betul! '+target.name, 'emo_'+target.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(target.emo,'Betul!','reward_emo.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(target.emo,'Betul!','reward_emo.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Bagaimana perasaannya jika '+target.text+'?', 'emo2_inst.mp3');
 }
-
 function run_emotion_3(){
   const el=document.getElementById('activityContent');
   const targets = [
@@ -755,7 +864,7 @@ function run_emotion_3(){
     c.onclick=()=>{
       if(emoji===t.a){
         c.classList.add('correct'); speak('Betul!', 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(emoji,'Betul!','reward_emo.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(emoji,'Betul!','reward_emo.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -765,7 +874,7 @@ function run_emotion_3(){
 
 
 /* ==================================================
-   DUNIA 7: PATTERN (UMUR 4-6)
+   DUNIA 8: PATTERN (UMUR 4-6)
    ================================================== */
 function run_pattern_1(){
   const el=document.getElementById('activityContent');
@@ -790,14 +899,13 @@ function run_pattern_1(){
     c.onclick=()=>{
       if(s===answer){
         c.classList.add('correct'); speak('Betul!', 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Apa bentuk seterusnya?', 'pat1_inst.mp3');
 }
-
 function run_pattern_2(){
   const el=document.getElementById('activityContent');
   const base = SHAPES[Math.floor(Math.random()*SHAPES.length)];
@@ -817,14 +925,13 @@ function run_pattern_2(){
     c.onclick=()=>{
       if(s===odd.emoji){
         c.classList.add('correct'); speak('Betul!', 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
   });
   speak('Mana bentuk yang berbeza?', 'pat2_inst.mp3');
 }
-
 function run_pattern_3(){
   const el=document.getElementById('activityContent');
   const items = [
@@ -846,7 +953,7 @@ function run_pattern_3(){
     c.onclick=()=>{
       if(v.s === target.s){
         c.classList.add('correct'); speak('Betul! '+v.n, 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextActivity); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextQuestion); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
