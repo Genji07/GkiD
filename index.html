@@ -834,10 +834,18 @@ function playAnimalSound(animal) {
   }
   animalAudio = new Audio(animal.audio);
   animalAudio.preload = 'none';
-  animalAudio.onerror = () => toast('Bunyi tidak dapat dimuatkan. Semak sambungan internet.');
+  let fallbackUsed = false;
+  const fallbackToLabel = () => {
+    if (fallbackUsed) return;
+    fallbackUsed = true;
+    // Fallback ini menyebut nama/bunyi dalam Bahasa Melayu, bukan meniru bunyi haiwan.
+    toast('Audio haiwan tidak tersedia. Sebutan Bahasa Melayu digunakan.');
+    speak(animal.name + '. Bunyi haiwan: ' + animal.sound + '.');
+  };
+  animalAudio.onerror = fallbackToLabel;
   const playback = animalAudio.play();
   if (playback && typeof playback.catch === 'function') {
-    playback.catch(() => toast('Telefon tidak dapat memainkan fail bunyi ini.'));
+    playback.catch(fallbackToLabel);
   }
 }
 
