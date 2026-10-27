@@ -112,7 +112,9 @@ p{font-size:clamp(16px,4vw,22px);line-height:1.5;margin-bottom:12px;max-width:60
 <script>
 'use strict';
 const state = {
-  age: null, world: null,
+  age: null, 
+  currentWorld: null,
+  currentLevel: 1,
   stars: parseInt(localStorage.getItem('gkid_stars')||'0',10),
   soundOn: localStorage.getItem('gkid_sound')!=='off',
   animOn: localStorage.getItem('gkid_anim')!=='off',
@@ -214,6 +216,19 @@ function closeReward(){
   if(cb)cb();
 }
 
+// --- FUNGSI KEMAJUAN (PROGRESSION) ---
+function nextActivity() {
+  if (state.currentLevel < 3) {
+    startActivity(state.currentWorld, state.currentLevel + 1);
+  } else {
+    // Habis 3 aktiviti, balik ke menu dunia
+    state.currentWorld = null;
+    state.currentLevel = 1;
+    goTo('world');
+  }
+}
+// -------------------------------------
+
 function buildAgePicker(){
   const p=document.getElementById('agePicker');p.innerHTML='';
   AGES.forEach((a,i)=>{
@@ -236,7 +251,7 @@ function buildWorlds(){
     const c=document.createElement('div'); c.className='card';
     c.innerHTML=`<div style="font-size:clamp(36px,10vw,52px)">${w.emoji}</div><div class="label">${w.name}</div>`;
     if(k===rec){c.style.border='4px solid var(--secondary)';}
-    c.onclick=()=>{ state.world=k; showLevelSelect(k); };
+    c.onclick=()=>{ showLevelSelect(k); };
     g.appendChild(c);
   });
 }
@@ -254,6 +269,8 @@ function showLevelSelect(worldKey) {
 }
 
 function startActivity(key, level) {
+  state.currentWorld = key;
+  state.currentLevel = level;
   goTo('activity');
   const fnName = `run_${key}_${level}`;
   if (typeof window[fnName] === 'function') {
@@ -263,7 +280,7 @@ function startActivity(key, level) {
   }
 }
 
-function exitActivity(){ goTo('world'); }
+function exitActivity(){ state.currentWorld = null; goTo('world'); }
 function replayInstruction(){ if(state.activityData && state.activityData.instruction) speak(state.activityData.instruction, state.activityData.audio); }
 
 
@@ -286,7 +303,7 @@ function run_sensory_1(){
         state.activityData.tapped=true;
         setTimeout(()=>{
           state.activityData=null;
-          showReward(a.emoji,'Bagus! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3',()=>{ state.world=null; goTo('world'); });
+          showReward(a.emoji,'Bagus! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3', nextActivity);
         },800);
       }
     };
@@ -311,7 +328,7 @@ function run_sensory_2(){
         state.activityData.tapped=true;
         setTimeout(()=>{
           state.activityData=null;
-          showReward('🎨','Bagus! Warna '+c.name,'reward_warna.mp3',()=>{ state.world=null; goTo('world'); });
+          showReward('🎨','Bagus! Warna '+c.name,'reward_warna.mp3', nextActivity);
         },800);
       }
     };
@@ -336,7 +353,7 @@ function run_sensory_3(){
         state.activityData.tapped=true;
         setTimeout(()=>{
           state.activityData=null;
-          showReward(o.e,'Bagus! '+o.n,'reward_objek.mp3',()=>{ state.world=null; goTo('world'); });
+          showReward(o.e,'Bagus! '+o.n,'reward_objek.mp3', nextActivity);
         },800);
       }
     };
@@ -361,7 +378,7 @@ function run_match_1(){
     card.onclick=()=>{
       if(c===target){
         card.classList.add('correct'); speak('Betul! '+c.name, 'color_'+c.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🎨','Betul! '+c.name,'reward_warna.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🎨','Betul! '+c.name,'reward_warna.mp3', nextActivity); },500);
       }else{ card.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>card.classList.remove('wrong'),600); }
     };
     g.appendChild(card);
@@ -382,7 +399,7 @@ function run_match_2(){
     card.onclick=()=>{
       if(a===target){
         card.classList.add('correct'); speak('Betul! '+a.name, 'animal_'+a.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(a.emoji,'Betul! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(a.emoji,'Betul! '+a.name,'reward_'+a.name.toLowerCase()+'.mp3', nextActivity); },500);
       }else{ card.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>card.classList.remove('wrong'),600); }
     };
     g.appendChild(card);
@@ -403,7 +420,7 @@ function run_match_3(){
     card.onclick=()=>{
       if(s===target){
         card.classList.add('correct'); speak('Betul! '+s.name, 'shape_'+s.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('⭐','Betul!','reward_bentuk.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('⭐','Betul!','reward_bentuk.mp3', nextActivity); },500);
       }else{ card.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>card.classList.remove('wrong'),600); }
     };
     g.appendChild(card);
@@ -432,7 +449,7 @@ function run_count_1(){
     c.onclick=()=>{
       if(v===n){
         c.classList.add('correct'); speak('Betul! '+n, 'num_'+n+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -456,7 +473,7 @@ function run_count_2(){
     c.onclick=()=>{
       if(v===n){
         c.classList.add('correct'); speak('Betul! '+n, 'num_'+n+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🔢','Betul! '+n,'reward_kira.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -481,7 +498,7 @@ function run_count_3(){
     c.onclick=()=>{
       if(v===n){
         c.classList.add('correct'); speak('Betul! '+n, 'num_'+n+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🍎','Betul! '+n,'reward_kira.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🍎','Betul! '+n,'reward_kira.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -507,7 +524,7 @@ function run_compare_1(){
     c.onclick=()=>{
       if(v===Math.max(a,b)){
         c.classList.add('correct'); speak('Betul! '+Math.max(a,b)+' lebih banyak', 'correct_more.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -529,7 +546,7 @@ function run_compare_2(){
     c.onclick=()=>{
       if(v===Math.min(a,b)){
         c.classList.add('correct'); speak('Betul! '+Math.min(a,b)+' lebih sedikit', 'correct_less.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('⚖️','Betul!','reward_compare.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -552,7 +569,7 @@ function run_compare_3(){
     c.onclick=()=>{
       if(v.s === 'Besar'){
         c.classList.add('correct'); speak('Betul! '+v.n+' besar', 'correct_big.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🐘','Betul!','reward_compare.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🐘','Betul!','reward_compare.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -593,7 +610,7 @@ function run_word_1(){
       if(l===expect){
         prog.push(l); b.style.opacity='0.3'; b.style.pointerEvents='none'; speak(l, 'letter_'+l.toLowerCase()+'.mp3'); render();
         if(prog.length===t.word.length){
-          setTimeout(()=>{ state.activityData=null; showReward('📝','Pandai! '+t.word,'reward_eja.mp3',()=>{ state.world=null; goTo('world'); }); },400);
+          setTimeout(()=>{ state.activityData=null; showReward('📝','Pandai! '+t.word,'reward_eja.mp3', nextActivity); },400);
         }
       }else{
         b.style.border='3px solid var(--danger)'; speak('Cuba lagi', 'wrong.mp3');
@@ -627,7 +644,7 @@ function run_word_2(){
     c.onclick=()=>{
       if(l===firstLetter){
         c.classList.add('correct'); speak('Betul! '+firstLetter, 'letter_'+l.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -652,7 +669,7 @@ function run_word_3(){
     c.onclick=()=>{
       if(w===t){
         c.classList.add('correct'); speak('Betul! '+t.word, 'word_'+t.word.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('📝','Betul!','reward_eja.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -677,7 +694,7 @@ function run_emotion_1(){
     c.onclick=()=>{
       if(e===target){
         c.classList.add('correct'); speak('Betul! '+e.name, 'emo_'+e.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(e.emoji,'Betul!','reward_emo.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(e.emoji,'Betul!','reward_emo.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -708,7 +725,7 @@ function run_emotion_2(){
     c.onclick=()=>{
       if(emoji===target.emo){
         c.classList.add('correct'); speak('Betul! '+target.name, 'emo_'+target.name.toLowerCase()+'.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(target.emo,'Betul!','reward_emo.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(target.emo,'Betul!','reward_emo.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -738,7 +755,7 @@ function run_emotion_3(){
     c.onclick=()=>{
       if(emoji===t.a){
         c.classList.add('correct'); speak('Betul!', 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward(emoji,'Betul!','reward_emo.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward(emoji,'Betul!','reward_emo.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -773,7 +790,7 @@ function run_pattern_1(){
     c.onclick=()=>{
       if(s===answer){
         c.classList.add('correct'); speak('Betul!', 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -800,7 +817,7 @@ function run_pattern_2(){
     c.onclick=()=>{
       if(s===odd.emoji){
         c.classList.add('correct'); speak('Betul!', 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
@@ -829,7 +846,7 @@ function run_pattern_3(){
     c.onclick=()=>{
       if(v.s === target.s){
         c.classList.add('correct'); speak('Betul! '+v.n, 'correct.mp3');
-        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3',()=>{ state.world=null; goTo('world'); }); },500);
+        setTimeout(()=>{ state.activityData=null; showReward('🧩','Betul!','reward_pat.mp3', nextActivity); },500);
       }else{c.classList.add('wrong'); speak('Cuba lagi', 'wrong.mp3'); setTimeout(()=>c.classList.remove('wrong'),600);}
     };
     g.appendChild(c);
