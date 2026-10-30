@@ -593,6 +593,16 @@ body {
 @keyframes guide-bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
 @media(max-width:600px){.adventure-guide{gap:9px;padding:12px}.guide-mascot{flex-basis:50px;height:50px;font-size:31px;border-radius:17px}.guide-copy strong{font-size:12px}.guide-copy span{font-size:11px}.guide-stars{padding:7px}.adventure-map{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:15px 10px}.map-stop{min-height:108px}.map-stop:nth-child(4n+2),.map-stop:nth-child(4n+4){transform:none}.map-stop:nth-child(even){transform:translateY(7px)}.map-stop:nth-child(even):hover{transform:translateY(3px)}}
 @media(prefers-reduced-motion:reduce){.guide-mascot{animation:none}}
+
+/* GkiD Advance entry */
+.advance-entry{display:flex;align-items:center;gap:12px;width:min(100%,520px);margin-top:17px;padding:13px 15px;border:1px solid #dceee3;border-radius:18px;background:linear-gradient(110deg,#fff 0%,#effbf4 100%);color:var(--text);text-decoration:none;box-shadow:0 7px 20px rgba(38,70,52,.06);transition:transform .16s ease,box-shadow .16s ease}
+.advance-entry:hover{transform:translateY(-2px);box-shadow:0 12px 25px rgba(38,70,52,.1)}
+.advance-entry-icon{width:43px;height:43px;flex:0 0 43px;display:grid;place-items:center;border-radius:14px;background:#e4f6eb;font-size:24px}
+.advance-entry-copy{display:flex;min-width:0;flex-direction:column;gap:3px;text-align:left}
+.advance-entry-copy strong{font-size:13px;font-weight:950}
+.advance-entry-copy small{font-size:10px;line-height:1.35;color:var(--ink-soft)}
+.advance-entry-arrow{margin-left:auto;color:#4b9c7e;font-size:21px;font-weight:900}
+@media(max-width:390px){.advance-entry{padding:11px}.advance-entry-copy small{font-size:9px}}
 </style>
 </head>
 
@@ -629,6 +639,11 @@ body {
             <button class="btn hero-start" onclick="showScreen('ages')"><span>Mula pengembaraan</span><span aria-hidden="true">➜</span></button>
             <button class="btn light parent-start" onclick="parentGate()">Untuk ibu bapa</button>
           </div>
+          <a class="advance-entry" href="./advance.html">
+            <span class="advance-entry-icon" aria-hidden="true">🚀</span>
+            <span class="advance-entry-copy"><strong>Cuba GkiD Advance</strong><small>Modul lanjutan: nombor, bahasa, logik, sains, emosi & ingatan</small></span>
+            <span class="advance-entry-arrow" aria-hidden="true">➜</span>
+          </a>
           <div class="hero-trust"><span>✓</span> Aktiviti ringkas <span>✓</span> Bahasa Melayu <span>✓</span> Mesra telefon</div>
         </div>
         <div class="hero-art" aria-label="Ilustrasi taman pembelajaran" role="img">
