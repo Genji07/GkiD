@@ -426,7 +426,7 @@ body {
 .home-screen { justify-content: flex-start; padding-top: 8px; }
 .home-shell { width: 100%; max-width: 1050px; margin: 0 auto; }
 .brand-row { display: flex; align-items: center; gap: 11px; margin: 0 0 clamp(25px,5vw,54px); }
-.brand-mark { width: 47px; height: 47px; display: grid; place-items: center; background: #243b35; color: #fff; border-radius: 16px 16px 16px 5px; font-size: 27px; font-weight: 950; box-shadow: 0 6px 0 #c5d9cb; }
+.brand-mark { width: 52px; height: 52px; flex: 0 0 52px; display: grid; place-items: center; overflow: hidden; background: #fff1d8; border-radius: 18px; box-shadow: 0 5px 0 #f1d5b1, 0 8px 18px rgba(80,70,40,.10); transform: rotate(-3deg); }\n.brand-mark svg { display: block; width: 100%; height: 100%; }
 .brand-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
 .brand-copy strong { font-size: 22px; font-weight: 950; letter-spacing: -.06em; }
 .brand-copy span { font-size: 11px; color: var(--ink-soft); font-weight: 700; }
@@ -604,7 +604,17 @@ body {
   <section class="screen active home-screen" id="home">
     <div class="home-shell">
       <header class="brand-row">
-        <div class="brand-mark" aria-hidden="true">G</div>
+        <div class="brand-mark" aria-label="Logo GkiD" role="img">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs><linearGradient id="gkidLogoBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffbd65"/><stop offset="1" stop-color="#ff795b"/></linearGradient></defs>
+            <rect x="2" y="2" width="60" height="60" rx="20" fill="url(#gkidLogoBg)"/>
+            <path d="M12 20 Q22 15 31 23 V49 Q22 41 12 46 Z" fill="#fffdf4" stroke="#fffdf4" stroke-linejoin="round" stroke-width="2"/>
+            <path d="M52 20 Q42 15 33 23 V49 Q42 41 52 46 Z" fill="#e9fff0" stroke="#e9fff0" stroke-linejoin="round" stroke-width="2"/>
+            <path d="M32 23 V49" stroke="#6a9b78" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M42 10 L44.5 15.5 L50.5 16 L46 20 L47.2 26 L42 23 L36.8 26 L38 20 L33.5 16 L39.5 15.5 Z" fill="#fff4a8" stroke="#fffdf4" stroke-width="1.2" stroke-linejoin="round"/>
+            <circle cx="17" cy="14" r="2.5" fill="#fff4a8"/><circle cx="54" cy="32" r="2" fill="#fff4a8"/>
+          </svg>
+        </div>
         <div class="brand-copy"><strong>GkiD</strong><span>Belajar sambil bermain</span></div>
         <div class="home-stars" aria-label="Jumlah bintang">⭐ <span id="homeStarCount">0</span></div>
       </header>
