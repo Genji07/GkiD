@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#ff795b">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon-192.png" type="image/png">
 <title>GkiD 2.0 — Belajar Sambil Bermain</title>
 
 <style>
@@ -2069,6 +2071,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('no-animation');
   }
 });
+  // Daftarkan service worker untuk cache aset dan sokongan PWA.
+  if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js')
+        .catch(error => console.warn('Service worker GkiD gagal didaftarkan:', error));
+    });
+  }
 </script>
 </body>
 </html>
