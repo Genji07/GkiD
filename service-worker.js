@@ -1,12 +1,13 @@
 // GkiD Service Worker v2
 // Strategi: cache-first untuk aset, network-first untuk navigasi
-const CACHE = 'gkid-v4';
+const CACHE = 'gkid-v5';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/gkid-icon.svg?v=2'
 ];
 
 self.addEventListener('install', e => {
