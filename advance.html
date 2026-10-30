@@ -100,7 +100,7 @@ function makeQuestions(type){
  for(let i=0;i<3;i++){
   if(type==='number'){
    const max=age===0?3:age===1?5:10,n=1+Math.floor(Math.random()*max),icons=['⭐','🍎','🐟','🧸'];
-   const opts=shuffle([n,Math.max(1,n-1),n+1,n+2]).slice(0,3);
+   const opts=shuffle([n,...shuffle([Math.max(1,n-1),n+1,n+2]).slice(0,2)]);
    out.push({prompt:age===0?'Mari kira bersama. Berapa objek?':'Ada berapa objek semuanya?',visual:pick(icons).repeat(n),hint:age===0?'Sentuh dan kira satu demi satu bersama orang dewasa.':'Kira perlahan-lahan, satu objek untuk satu nombor.',opts:opts.map(String),answer:String(n),explain:'Bagus! Kita kira satu demi satu.'});
   }else if(type==='language'){
    const w=pick(WORDS);
