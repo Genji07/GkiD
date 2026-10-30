@@ -1,9 +1,10 @@
 // GkiD Service Worker v2
 // Strategi: cache-first untuk aset, network-first untuk navigasi
-const CACHE = 'gkid-v5';
+const CACHE = 'gkid-v6';
 const ASSETS = [
   './',
   './index.html',
+  './advance.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
