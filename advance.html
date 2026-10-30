@@ -53,6 +53,7 @@ footer{text-align:center;color:#829087;font-size:11px;margin-top:23px}
   <button class="activity" data-game="science"><span class="emoji">🌱</span><strong>Sains sekeliling</strong><small>Perhati alam dan kumpulkan objek mengikut ciri.</small><span class="tag">PENEROKAAN</span></button>
   <button class="activity" data-game="emotion"><span class="emoji">😊</span><strong>Emosi & sosial</strong><small>Kenal perasaan dan fikir tindakan yang membantu.</small><span class="tag">SOSIOEMOSI</span></button>
   <button class="activity" data-game="memory"><span class="emoji">🧠</span><strong>Ingatan & fokus</strong><small>Latihan memori visual secara santai.</small><span class="tag">INGATAN</span></button>
+  <button class="activity" data-game="reading"><span class="emoji">📚</span><strong>Mengeja & membaca</strong><small>Belajar Bahasa Melayu dan English melalui gambar, bunyi huruf, suku kata dan ejaan.</small><span class="tag">LITERASI DWIBAHASA</span></button>
  </div>
 </section>
 <section class="note">
@@ -78,6 +79,29 @@ footer{text-align:center;color:#829087;font-size:11px;margin-top:23px}
 <script>
 'use strict';
 const AGE_FOCUS=['Fokus: deria, bahasa & padanan','Fokus: bahasa, nombor & pengelasan','Fokus: literasi, matematik & penaakulan'];
+const READING_WORDS={
+ ms:[
+  {word:'BOLA',icon:'⚽',syllables:2,first:'B',parts:['BO','LA'],meaning:'bola'},
+  {word:'BUKU',icon:'📚',syllables:2,first:'B',parts:['BU','KU'],meaning:'buku'},
+  {word:'MATA',icon:'👀',syllables:2,first:'M',parts:['MA','TA'],meaning:'mata'},
+  {word:'SUSU',icon:'🥛',syllables:2,first:'S',parts:['SU','SU'],meaning:'susu'},
+  {word:'KAKI',icon:'🦶',syllables:2,first:'K',parts:['KA','KI'],meaning:'kaki'},
+  {word:'GIGI',icon:'🦷',syllables:2,first:'G',parts:['GI','GI'],meaning:'gigi'},
+  {word:'TOPI',icon:'🧢',syllables:2,first:'T',parts:['TO','PI'],meaning:'topi'},
+  {word:'IKAN',icon:'🐟',syllables:2,first:'I',parts:['I','KAN'],meaning:'ikan'}
+ ],
+ en:[
+  {word:'BALL',icon:'⚽',syllables:1,first:'B',parts:['B','ALL'],meaning:'ball'},
+  {word:'BOOK',icon:'📚',syllables:1,first:'B',parts:['B','OOK'],meaning:'book'},
+  {word:'FISH',icon:'🐟',syllables:1,first:'F',parts:['F','ISH'],meaning:'fish'},
+  {word:'MILK',icon:'🥛',syllables:1,first:'M',parts:['M','ILK'],meaning:'milk'},
+  {word:'HAT',icon:'🧢',syllables:1,first:'H',parts:['H','AT'],meaning:'hat'},
+  {word:'FROG',icon:'🐸',syllables:1,first:'F',parts:['F','ROG'],meaning:'frog'},
+  {word:'CAKE',icon:'🍰',syllables:1,first:'C',parts:['C','AKE'],meaning:'cake'},
+  {word:'STAR',icon:'⭐',syllables:1,first:'S',parts:['S','TAR'],meaning:'star'}
+ ]
+};
+let readingLanguage='ms';
 const WORDS=[{word:'BOLA',icon:'⚽',syllables:2,first:'B'},{word:'MATA',icon:'👀',syllables:2,first:'M'},{word:'BUKU',icon:'📚',syllables:2,first:'B'},{word:'SUSU',icon:'🥛',syllables:2,first:'S'},{word:'KUCING',icon:'🐱',syllables:2,first:'K'},{word:'KERETA',icon:'🚗',syllables:3,first:'K'},{word:'PISANG',icon:'🍌',syllables:2,first:'P'},{word:'RUMAH',icon:'🏠',syllables:2,first:'R'}];
 const EMOTIONS=[{name:'Gembira',icon:'😄',scene:'Kawan ajak bermain bersama.'},{name:'Sedih',icon:'😢',scene:'Menara blok yang dibina terjatuh.'},{name:'Marah',icon:'😠',scene:'Mainan yang sedang digunakan diambil tanpa izin.'},{name:'Takut',icon:'😟',scene:'Terdengar guruh yang kuat.'},{name:'Tenang',icon:'😌',scene:'Duduk berehat sambil membaca buku.'}];
 const SCIENCE=[{name:'Pokok',icon:'🌳',kind:'hidup'},{name:'Kucing',icon:'🐈',kind:'hidup'},{name:'Batu',icon:'🪨',kind:'bukan hidup'},{name:'Basikal',icon:'🚲',kind:'bukan hidup'},{name:'Bunga',icon:'🌻',kind:'hidup'},{name:'Bola',icon:'⚽',kind:'bukan hidup'}];
@@ -90,7 +114,7 @@ function pick(a){return a[Math.floor(Math.random()*a.length)]}
 function setProgress(n){$('progressFill').style.width=n+'%'}
 function startGame(type){
  currentGame=type;qIndex=0;round=0;matched=0;opened=[];lock=false;
- const names={number:'Nombor & kuantiti',language:'Bahasa & bunyi',logic:'Corak & logik',science:'Sains sekeliling',emotion:'Emosi & sosial',memory:'Ingatan & fokus'};
+ const names={number:'Nombor & kuantiti',language:'Bahasa & bunyi',logic:'Corak & logik',science:'Sains sekeliling',emotion:'Emosi & sosial',memory:'Ingatan & fokus',reading:readingLanguage==='ms'?'Mengeja & membaca — Bahasa Melayu':'Spelling & reading — English'};
  $('gameName').textContent=names[type];$('game').style.display='block';document.body.style.overflow='hidden';
  if(type==='memory'){renderMemory();return}
  questions=makeQuestions(type);renderQuestion();
@@ -107,6 +131,21 @@ function makeQuestions(type){
    if(age===0)out.push({prompt:'Cari gambar yang sama.',visual:w.icon,hint:'Sebut nama gambar bersama-sama.',opts:shuffle([w.icon,...shuffle(WORDS.filter(x=>x!==w).map(x=>x.icon)).slice(0,2)]),answer:w.icon,explain:'Ya, ini '+w.word.toLowerCase()+'.'});
    else if(age===1)out.push({prompt:'Berapa suku kata dalam perkataan '+w.word.toLowerCase()+'?',visual:w.icon,hint:'Tepuk tangan bagi setiap suku kata: bo-la.',opts:['1','2','3'],answer:String(w.syllables),explain:'Bagus! Sebut perkataan itu perlahan-lahan.'});
    else out.push({prompt:'Apakah huruf awal bagi '+w.word.toLowerCase()+'?',visual:w.icon+'  '+w.word,hint:'Dengar bunyi pertama perkataan itu.',opts:shuffle([w.first,...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(x=>x!==w.first).slice(0,2)]),answer:w.first,explain:'Betul! '+w.word+' bermula dengan huruf '+w.first+'.'});
+  }else if(type==='reading'){
+   const w=pick(READING_WORDS[readingLanguage]);
+   if(age===0){
+    const choices=shuffle([w,...shuffle(READING_WORDS[readingLanguage].filter(x=>x!==w)).slice(0,2)]);
+    out.push({prompt:readingLanguage==='ms'?'Cari gambar yang sama.':'Find the matching picture.',visual:w.icon,hint:readingLanguage==='ms'?'Dengar dan sebut perkataan bersama orang dewasa.':'Listen and say the word with a grown-up.',opts:choices.map(x=>x.icon),answer:w.icon,explain:readingLanguage==='ms'?'Bagus! Ini '+w.word.toLowerCase()+'.':'Well done! This is '+w.word.toLowerCase()+'.',speak:w.word,lang:readingLanguage});
+   }else if(age===1){
+    if(readingLanguage==='ms'){
+     out.push({prompt:'Berapa suku kata dalam perkataan '+w.word.toLowerCase()+'?',visual:w.icon+'  '+w.word,hint:'Sebut perlahan-lahan dan tepuk bagi setiap suku kata.',opts:shuffle(['1','2','3']),answer:String(w.syllables),explain:'Bagus! Cuba sebut: '+w.parts.join(' — ')+'.',speak:w.word,lang:'ms'});
+    }else{
+     out.push({prompt:'Which letter makes the first sound in '+w.word.toLowerCase()+'?',visual:w.icon+'  '+w.word,hint:'Say the word slowly. Listen to its first sound.',opts:shuffle([w.first,...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(x=>x!==w.first).slice(0,2)]),answer:w.first,explain:'Great! '+w.word+' begins with the letter '+w.first+'.',speak:w.word,lang:'en'});
+    }
+   }else{
+    const distractors=shuffle(READING_WORDS[readingLanguage].filter(x=>x!==w).map(x=>x.word)).slice(0,2);
+    out.push({prompt:readingLanguage==='ms'?'Pilih ejaan yang betul.':'Choose the correct spelling.',visual:w.icon,hint:readingLanguage==='ms'?'Lihat gambar dan perhatikan susunan huruf.':'Look at the picture and check the letter order.',opts:shuffle([w.word,...distractors]),answer:w.word,explain:readingLanguage==='ms'?'Tepat! Ejaannya ialah '+w.word+'.':'Correct! The spelling is '+w.word+'.',speak:w.word,lang:readingLanguage});
+   }
   }else if(type==='logic'){
    const a=pick(['🔴','🟡','🔵','🟢']),b=pick(['🟣','🟠','⚫','🟤']);
    const opts=shuffle([a,b,'⭐','❤️']);
@@ -129,6 +168,11 @@ function renderQuestion(){
  const p=document.createElement('div');p.className='prompt';p.textContent=q.prompt;$('gamePanel').appendChild(p);
  const v=document.createElement('div');v.className='visual';v.textContent=q.visual;$('gamePanel').appendChild(v);
  const h=document.createElement('div');h.className='hint';h.textContent=q.hint;$('gamePanel').appendChild(h);
+ if(q.speak&&'speechSynthesis' in window){
+  const speak=document.createElement('button');speak.className='game-top';speak.style.cssText='margin:12px auto 0;border:1px solid var(--line);background:#f1faf4;border-radius:13px;padding:10px 14px;font-weight:850;color:var(--ink)';speak.textContent=q.lang==='ms'?'🔊 Dengar sebutan':'🔊 Hear pronunciation';
+  speak.addEventListener('click',()=>{window.speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(q.speak);utterance.lang=q.lang==='ms'?'ms-MY':'en-GB';utterance.rate=.82;window.speechSynthesis.speak(utterance)});
+  $('gamePanel').appendChild(speak);
+ }
  const opts=document.createElement('div');opts.className='options';
  q.opts.forEach(value=>{const b=document.createElement('button');b.className='option';b.textContent=value;b.addEventListener('click',()=>choose(b,value,q));opts.appendChild(b)});
  $('gamePanel').appendChild(opts);
@@ -140,7 +184,7 @@ function choose(btn,value,q){
  const ok=String(value)===String(q.answer);
  document.querySelectorAll('.option').forEach(b=>{b.disabled=true;if(String(b.textContent)===String(q.answer))b.classList.add('good')});
  if(!ok)btn.classList.add('bad');
- $('feedback').textContent=ok?'🌟 '+q.explain:'Tak mengapa. Jawapan yang betul: '+q.answer+'. '+q.explain;
+ $('feedback').textContent=ok?'🌟 '+q.explain:(q.lang==='en'?'Not quite. The correct answer is: ':'Tak mengapa. Jawapan yang betul: ')+q.answer+'. '+q.explain;
  $('next').style.display='inline-block';round+=ok?1:0;
 }
 function renderMemory(){
