@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8f1">
+<meta name="description" content="GkiD Advance — aktiviti pembelajaran lanjutan untuk kanak-kanak umur 1 hingga 6 tahun.">
+<title>GkiD Advance — Belajar, Cuba & Teroka</title>
+<style>
+:root{--bg:#f7f8f1;--ink:#263d35;--muted:#718178;--coral:#ff795b;--mint:#59bfa5;--yellow:#ffd66b;--line:#e5ece3;--white:#fff;--shadow:0 12px 34px rgba(38,61,53,.09)}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 5% 0%,#fff0d7 0,transparent 32%),radial-gradient(ellipse at 100% 25%,#e2f7ec 0,transparent 35%),var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+button{font:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:3px solid #397e6c;outline-offset:3px}
+.wrap{width:min(1080px,100%);margin:auto;padding:18px 16px 48px}
+header{display:flex;align-items:center;gap:12px;margin:4px 0 25px}.logo{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:#ffead2;font-size:26px}.brand strong{display:block;font-size:19px;font-weight:950}.brand small{color:var(--muted);font-size:11px}.back{margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 13px;font-weight:800;color:var(--ink)}
+.hero{padding:clamp(22px,5vw,42px);border:1px solid #f0e8d8;border-radius:30px;background:linear-gradient(125deg,#fff 5%,#fff8e9 58%,#eaf8ef);box-shadow:var(--shadow);display:grid;grid-template-columns:1.3fr .7fr;gap:18px;align-items:center}
+.kicker{display:inline-flex;padding:7px 11px;border-radius:30px;background:#e8f7ef;color:#39866d;font-size:11px;font-weight:900;letter-spacing:.04em}
+h1{font-size:clamp(35px,7vw,62px);line-height:1.02;letter-spacing:-.06em;margin:17px 0 12px}h1 em{font-style:normal;color:var(--coral)}.hero p{max-width:650px;color:var(--muted);font-size:16px;line-height:1.65;margin:0}
+.hero-art{justify-self:center;font-size:clamp(80px,16vw,140px);filter:drop-shadow(0 12px 12px #8aa98b35)}
+.section{margin-top:28px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:13px}.section h2{font-size:23px;letter-spacing:-.04em;margin:0}.section-head p{font-size:12px;color:var(--muted);margin:5px 0 0}
+.age-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.age{border:2px solid var(--line);border-radius:17px;background:#fff;padding:15px 8px;font-weight:900;color:var(--ink);box-shadow:0 4px 0 #e6ece4}.age.active{border-color:var(--mint);background:#effbf5;box-shadow:0 4px 0 #b5e4d1}
+.stats{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}.stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:9px 12px;font-size:12px;font-weight:800;color:#64776d}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.activity{position:relative;text-align:left;border:1px solid var(--line);border-radius:22px;padding:18px;background:#fff;box-shadow:0 7px 22px rgba(38,61,53,.055);min-height:185px;color:var(--ink);display:flex;flex-direction:column;align-items:flex-start;gap:8px;transition:transform .16s ease}.activity:hover{transform:translateY(-3px)}.activity .emoji{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;background:#fff2d8;font-size:29px}.activity:nth-child(2) .emoji{background:#e9f5ff}.activity:nth-child(3) .emoji{background:#f4eefe}.activity:nth-child(4) .emoji{background:#e8f8ee}.activity:nth-child(5) .emoji{background:#ffe9e6}.activity:nth-child(6) .emoji{background:#e9f5f3}.activity strong{font-size:16px}.activity small{color:var(--muted);line-height:1.4;font-size:12px}.tag{margin-top:auto;padding:6px 9px;border-radius:20px;background:#f2f6f0;color:#5c7868;font-size:10px;font-weight:900}
+.note{border:1px solid #e6eee5;border-radius:20px;background:#ffffffb8;padding:18px;margin-top:25px}.note h3{margin:0 0 8px;font-size:16px}.note p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.principle{padding:13px;border-radius:15px;background:#f8faf5}.principle b{display:block;font-size:12px}.principle span{display:block;color:var(--muted);font-size:11px;line-height:1.45;margin-top:5px}
+.premium{margin-top:25px;border-radius:24px;padding:22px;background:#263d35;color:#fff;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}.premium h2{margin:0 0 7px;font-size:22px}.premium p{margin:0;color:#d2e1d8;font-size:12px;line-height:1.55}.price{font-size:26px;font-weight:950;white-space:nowrap}.price small{font-size:11px;font-weight:700;color:#c7d9cf}.disabled{border:0;border-radius:14px;background:#d6e4dc;color:#304a3e;padding:12px 15px;font-weight:900;grid-column:1/-1;cursor:not-allowed;opacity:.95}
+footer{text-align:center;color:#829087;font-size:11px;margin-top:23px}
+#game{display:none;position:fixed;inset:0;z-index:20;background:#f7f8f1;overflow:auto;padding:18px}.game-shell{width:min(720px,100%);margin:0 auto;padding:18px 0 45px}.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.game-top button{border:1px solid var(--line);background:#fff;border-radius:13px;padding:10px 13px;font-weight:850}.game-progress{height:8px;background:#e5ece3;border-radius:20px;overflow:hidden;margin:17px 0 25px}.game-progress span{display:block;height:100%;width:0;background:var(--mint);transition:width .2s}
+.game-panel{border:1px solid var(--line);background:#fff;border-radius:26px;padding:clamp(18px,5vw,30px);box-shadow:var(--shadow);text-align:center}.game-panel .prompt{font-size:clamp(21px,5vw,30px);font-weight:950;letter-spacing:-.04em;margin:7px 0 12px}.game-panel .hint{color:var(--muted);font-size:13px;line-height:1.5}.visual{font-size:clamp(45px,12vw,78px);line-height:1.5;margin:15px 0;word-break:break-word}.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:20px}.option{min-height:76px;border:2px solid var(--line);border-radius:18px;background:#fbfdf9;padding:12px;font-size:20px;font-weight:900;color:var(--ink)}.option:active{transform:scale(.98)}.option.good{border-color:#59bfa5;background:#edfbf4}.option.bad{border-color:#ed8d83;background:#fff2ef}.feedback{min-height:28px;margin-top:16px;font-weight:850;color:#39866d}.next{display:none;margin-top:12px;border:0;border-radius:15px;background:var(--coral);color:white;padding:14px 22px;font-weight:900}.result{font-size:64px;margin:12px}.memory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.memory-card{height:90px;border:2px solid var(--line);border-radius:17px;background:#f2f7f1;font-size:30px}.memory-card.open,.memory-card.matched{background:#effbf5;border-color:#59bfa5}.memory-card.matched{opacity:.55}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.hero-art{display:none}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.principles{grid-template-columns:1fr}.premium{grid-template-columns:1fr}.price{font-size:24px}}
+@media(max-width:390px){.cards{grid-template-columns:1fr}.age{font-size:12px}.options{gap:8px}.option{font-size:17px}.memory-card{height:78px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div class="logo" aria-hidden="true">🚀</div><div class="brand"><strong>GkiD Advance</strong><small>Belajar lebih mendalam, ikut tahap perkembangan</small></div><button class="back" onclick="location.href='./index.html'">← GkiD Basic</button></header>
+<section class="hero">
+ <div><span class="kicker">MODUL LANJUTAN • UMUR 1–6 TAHUN</span><h1>Teroka idea,<br><em>bina kemahiran!</em></h1><p>Aktiviti ringkas yang menggabungkan bahasa, nombor, sains, logik, ingatan dan emosi. Tahap aktiviti berubah mengikut umur, dengan galakan untuk ibu bapa bermain bersama.</p></div>
+ <div class="hero-art" aria-hidden="true">🧠✨🧩</div>
+</section>
+<section class="section">
+ <div class="section-head"><div><h2>Siapa yang sedang belajar?</h2><p>Pilih umur supaya cabaran sesuai dengan perkembangan anak.</p></div></div>
+ <div class="age-row" id="ageRow">
+  <button class="age active" data-age="0">👶 1–2 tahun</button><button class="age" data-age="1">🧒 3–4 tahun</button><button class="age" data-age="2">🎒 5–6 tahun</button>
+ </div>
+ <div class="stats"><span class="stat" id="ageFocus">Fokus: deria, bahasa & padanan</span><span class="stat">⭐ <span id="score">0</span> bintang Advance</span><span class="stat">Sesi pendek, ikut kesediaan anak</span></div>
+</section>
+<section class="section">
+ <div class="section-head"><div><h2>Makmal pembelajaran</h2><p>Pilih aktiviti untuk cuba satu pusingan contoh.</p></div></div>
+ <div class="cards" id="activities">
+  <button class="activity" data-game="number"><span class="emoji">🔢</span><strong>Nombor & kuantiti</strong><small>Kira, banding dan fikir tentang jumlah.</small><span class="tag">MATEMATIK AWAL</span></button>
+  <button class="activity" data-game="language"><span class="emoji">🔤</span><strong>Bahasa & bunyi</strong><small>Perkataan, suku kata dan bunyi awal.</small><span class="tag">LITERASI AWAL</span></button>
+  <button class="activity" data-game="logic"><span class="emoji">🧩</span><strong>Corak & logik</strong><small>Kenal urutan dan cari apa yang seterusnya.</small><span class="tag">PEMIKIRAN</span></button>
+  <button class="activity" data-game="science"><span class="emoji">🌱</span><strong>Sains sekeliling</strong><small>Perhati alam dan kumpulkan objek mengikut ciri.</small><span class="tag">PENEROKAAN</span></button>
+  <button class="activity" data-game="emotion"><span class="emoji">😊</span><strong>Emosi & sosial</strong><small>Kenal perasaan dan fikir tindakan yang membantu.</small><span class="tag">SOSIOEMOSI</span></button>
+  <button class="activity" data-game="memory"><span class="emoji">🧠</span><strong>Ingatan & fokus</strong><small>Latihan memori visual secara santai.</small><span class="tag">INGATAN</span></button>
+ </div>
+</section>
+<section class="note">
+ <h3>🌼 Cara pembelajaran GkiD Advance</h3>
+ <p>Aktiviti menggunakan pendekatan bermain aktif dan bimbingan berperingkat. Tiada hukuman atau tekanan masa. Berhenti apabila anak penat atau hilang minat.</p>
+ <div class="principles">
+  <div class="principle"><b>🎯 Ingat semula</b><span>Soalan ringkas membantu anak mengingat dan menggunakan semula perkara yang dipelajari.</span></div>
+  <div class="principle"><b>🪜 Tahap berperingkat</b><span>Mulakan dengan contoh mudah, kemudian tambah satu cabaran pada satu masa.</span></div>
+  <div class="principle"><b>👨‍👩‍👧 Main bersama</b><span>Orang dewasa boleh berbual, tunjuk contoh dan memberi masa untuk anak mencuba.</span></div>
+ </div>
+</section>
+<section class="premium">
+ <div><h2>🔒 Akses penuh GkiD Advance</h2><p>Pelan langganan bulanan dirancang melalui Google Play. Pembelian, pemulihan langganan dan pengesahan akses akan diaktifkan selepas aplikasi Android serta akaun Play Console disediakan.</p></div>
+ <div class="price">RM19.90 <small>/ bulan*</small></div>
+ <button class="disabled" disabled aria-disabled="true">Langganan Google Play belum tersedia</button>
+ <p style="grid-column:1/-1;font-size:10px;color:#c7d9cf">*Harga cadangan sahaja. Tiada bayaran atau langganan sebenar dibuat pada halaman ini. Aktiviti di atas ialah pratonton.</p>
+</section>
+<footer>GkiD Advance • Pratonton pembelajaran • Kemajuan contoh disimpan pada peranti ini sahaja.</footer>
+</div>
+<div id="game" role="dialog" aria-modal="true" aria-label="Permainan pembelajaran">
+ <div class="game-shell"><div class="game-top"><strong id="gameName">Aktiviti</strong><button id="closeGame">Tutup ✕</button></div><div class="game-progress"><span id="progressFill"></span></div><div class="game-panel" id="gamePanel"></div></div>
+</div>
+<script>
+'use strict';
+const AGE_FOCUS=['Fokus: deria, bahasa & padanan','Fokus: bahasa, nombor & pengelasan','Fokus: literasi, matematik & penaakulan'];
+const WORDS=[{word:'BOLA',icon:'⚽',syllables:2,first:'B'},{word:'MATA',icon:'👀',syllables:2,first:'M'},{word:'BUKU',icon:'📚',syllables:2,first:'B'},{word:'SUSU',icon:'🥛',syllables:2,first:'S'},{word:'KUCING',icon:'🐱',syllables:2,first:'K'},{word:'KERETA',icon:'🚗',syllables:3,first:'K'},{word:'PISANG',icon:'🍌',syllables:2,first:'P'},{word:'RUMAH',icon:'🏠',syllables:2,first:'R'}];
+const EMOTIONS=[{name:'Gembira',icon:'😄',scene:'Kawan ajak bermain bersama.'},{name:'Sedih',icon:'😢',scene:'Menara blok yang dibina terjatuh.'},{name:'Marah',icon:'😠',scene:'Mainan yang sedang digunakan diambil tanpa izin.'},{name:'Takut',icon:'😟',scene:'Terdengar guruh yang kuat.'},{name:'Tenang',icon:'😌',scene:'Duduk berehat sambil membaca buku.'}];
+const SCIENCE=[{name:'Pokok',icon:'🌳',kind:'hidup'},{name:'Kucing',icon:'🐈',kind:'hidup'},{name:'Batu',icon:'🪨',kind:'bukan hidup'},{name:'Basikal',icon:'🚲',kind:'bukan hidup'},{name:'Bunga',icon:'🌻',kind:'hidup'},{name:'Bola',icon:'⚽',kind:'bukan hidup'}];
+const $=id=>document.getElementById(id);
+let age=0,score=Number(localStorage.getItem('gkid_adv_preview_stars')||0),round=0,currentGame='',questions=[],qIndex=0,matched=0,opened=[],lock=false;
+$('score').textContent=score;
+document.querySelectorAll('.age').forEach(b=>b.addEventListener('click',()=>{age=Number(b.dataset.age);document.querySelectorAll('.age').forEach(x=>x.classList.toggle('active',x===b));$('ageFocus').textContent=AGE_FOCUS[age];}));
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+function setProgress(n){$('progressFill').style.width=n+'%'}
+function startGame(type){
+ currentGame=type;qIndex=0;round=0;matched=0;opened=[];lock=false;
+ const names={number:'Nombor & kuantiti',language:'Bahasa & bunyi',logic:'Corak & logik',science:'Sains sekeliling',emotion:'Emosi & sosial',memory:'Ingatan & fokus'};
+ $('gameName').textContent=names[type];$('game').style.display='block';document.body.style.overflow='hidden';
+ if(type==='memory'){renderMemory();return}
+ questions=makeQuestions(type);renderQuestion();
+}
+function makeQuestions(type){
+ const out=[];
+ for(let i=0;i<3;i++){
+  if(type==='number'){
+   const max=age===0?3:age===1?5:10,n=1+Math.floor(Math.random()*max),icons=['⭐','🍎','🐟','🧸'];
+   const opts=shuffle([n,Math.max(1,n-1),n+1,n+2]).slice(0,3);
+   out.push({prompt:age===0?'Mari kira bersama. Berapa objek?':'Ada berapa objek semuanya?',visual:pick(icons).repeat(n),hint:age===0?'Sentuh dan kira satu demi satu bersama orang dewasa.':'Kira perlahan-lahan, satu objek untuk satu nombor.',opts:opts.map(String),answer:String(n),explain:'Bagus! Kita kira satu demi satu.'});
+  }else if(type==='language'){
+   const w=pick(WORDS);
+   if(age===0)out.push({prompt:'Cari gambar yang sama.',visual:w.icon,hint:'Sebut nama gambar bersama-sama.',opts:shuffle([w.icon,...shuffle(WORDS.filter(x=>x!==w).map(x=>x.icon)).slice(0,2)]),answer:w.icon,explain:'Ya, ini '+w.word.toLowerCase()+'.'});
+   else if(age===1)out.push({prompt:'Berapa suku kata dalam perkataan '+w.word.toLowerCase()+'?',visual:w.icon,hint:'Tepuk tangan bagi setiap suku kata: bo-la.',opts:['1','2','3'],answer:String(w.syllables),explain:'Bagus! Sebut perkataan itu perlahan-lahan.'});
+   else out.push({prompt:'Apakah huruf awal bagi '+w.word.toLowerCase()+'?',visual:w.icon+'  '+w.word,hint:'Dengar bunyi pertama perkataan itu.',opts:shuffle([w.first,...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(x=>x!==w.first).slice(0,2)]),answer:w.first,explain:'Betul! '+w.word+' bermula dengan huruf '+w.first+'.'});
+  }else if(type==='logic'){
+   const a=pick(['🔴','🟡','🔵','🟢']),b=pick(['🟣','🟠','⚫','🟤']);
+   const opts=shuffle([a,b,'⭐','❤️']);
+   out.push({prompt:'Apakah yang datang selepas ini?',visual:[a,b,a,b,a,'❓'].join(' '),hint:'Lihat corak yang berulang: A, B, A, B…',opts:opts,answer:b,explain:'Tepat! Corak A-B berulang.'});
+  }else if(type==='science'){
+   const item=pick(SCIENCE);
+   const opts=['hidup','bukan hidup'];
+   out.push({prompt:item.icon+' '+item.name+' — benda ini?',visual:item.icon,hint:'Fikir sama ada ia membesar dan memerlukan air atau makanan.',opts:shuffle(opts),answer:item.kind,explain:'Bagus! '+item.name+' ialah benda '+item.kind+'.'});
+  }else if(type==='emotion'){
+   const e=pick(EMOTIONS);
+   const opts=shuffle([e.name,...EMOTIONS.filter(x=>x!==e).map(x=>x.name).slice(0,2)]);
+   out.push({prompt:e.scene,visual:'💬',hint:'Perasaan boleh berbeza. Tiada siapa perlu malu untuk bercerita.',opts:opts,answer:e.name,explain:'Terima kasih kerana fikir tentang perasaan. Kita boleh berbual dan minta bantuan orang dewasa.'});
+  }
+ }
+ return out;
+}
+function renderQuestion(){
+ const q=questions[qIndex];setProgress((qIndex/3)*100);
+ $('gamePanel').innerHTML='';
+ const p=document.createElement('div');p.className='prompt';p.textContent=q.prompt;$('gamePanel').appendChild(p);
+ const v=document.createElement('div');v.className='visual';v.textContent=q.visual;$('gamePanel').appendChild(v);
+ const h=document.createElement('div');h.className='hint';h.textContent=q.hint;$('gamePanel').appendChild(h);
+ const opts=document.createElement('div');opts.className='options';
+ q.opts.forEach(value=>{const b=document.createElement('button');b.className='option';b.textContent=value;b.addEventListener('click',()=>choose(b,value,q));opts.appendChild(b)});
+ $('gamePanel').appendChild(opts);
+ const f=document.createElement('div');f.className='feedback';f.id='feedback';f.setAttribute('aria-live','polite');$('gamePanel').appendChild(f);
+ const n=document.createElement('button');n.className='next';n.id='next';n.textContent=qIndex===2?'Lihat hasil':'Soalan seterusnya →';n.addEventListener('click',()=>{qIndex++;if(qIndex<3)renderQuestion();else finishGame()});$('gamePanel').appendChild(n);
+}
+function choose(btn,value,q){
+ if($('next').style.display==='inline-block')return;
+ const ok=String(value)===String(q.answer);
+ document.querySelectorAll('.option').forEach(b=>{b.disabled=true;if(String(b.textContent)===String(q.answer))b.classList.add('good')});
+ if(!ok)btn.classList.add('bad');
+ $('feedback').textContent=ok?'🌟 '+q.explain:'Tak mengapa. Jawapan yang betul: '+q.answer+'. '+q.explain;
+ $('next').style.display='inline-block';round+=ok?1:0;
+}
+function renderMemory(){
+ setProgress(0);$('gamePanel').innerHTML='<div class="prompt">Cari tiga pasangan gambar yang sama.</div><div class="hint">Sentuh dua kad untuk melihat gambarnya. Cuba ingat kedudukan setiap gambar.</div><div class="memory-grid" id="memoryGrid"></div><div class="feedback" id="memoryFeedback" aria-live="polite">Pasangan ditemui: 0 / 3</div>';
+ const icons=shuffle(['🐸','🍎','🚗']).flatMap(x=>[x,x]);const grid=$('memoryGrid');
+ icons.forEach((icon,i)=>{const b=document.createElement('button');b.className='memory-card';b.textContent='❔';b.dataset.icon=icon;b.dataset.index=i;b.addEventListener('click',()=>flipCard(b));grid.appendChild(b)});
+}
+function flipCard(b){
+ if(lock||b.classList.contains('matched')||b.classList.contains('open'))return;
+ b.classList.add('open');b.textContent=b.dataset.icon;opened.push(b);
+ if(opened.length===2){lock=true;const [a,c]=opened;if(a.dataset.icon===c.dataset.icon){a.classList.add('matched');c.classList.add('matched');matched++;$('memoryFeedback').textContent='Pasangan ditemui: '+matched+' / 3';opened=[];lock=false;setProgress(matched/3*100);if(matched===3)setTimeout(finishGame,500)}
+ else setTimeout(()=>{a.classList.remove('open');c.classList.remove('open');a.textContent='❔';c.textContent='❔';opened=[];lock=false},750)}
+}
+function finishGame(){
+ const gained=round+(currentGame==='memory'?matched:0);
+ score+=gained;localStorage.setItem('gkid_adv_preview_stars',String(score));$('score').textContent=score;setProgress(100);
+ $('gamePanel').innerHTML='<div class="result">🌟</div><div class="prompt">Syabas kerana mencuba!</div><p class="hint">Kamu mendapat '+gained+' bintang pratonton. Yang penting ialah mencuba, berbual dan belajar bersama.</p><button class="next" style="display:inline-block" id="again">Cuba lagi</button><button class="next" style="display:inline-block;background:#59bfa5;margin-left:7px" id="done">Kembali ke Advance</button>';
+ $('again').addEventListener('click',()=>startGame(currentGame));$('done').addEventListener('click',closeGame);
+}
+function closeGame(){$('game').style.display='none';document.body.style.overflow='';}
+document.querySelectorAll('.activity').forEach(b=>b.addEventListener('click',()=>startGame(b.dataset.game)));
+$('closeGame').addEventListener('click',closeGame);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('game').style.display==='block')closeGame()});
+</script>
+</body>
+</html>
