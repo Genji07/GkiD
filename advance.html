@@ -22,6 +22,16 @@ h1{font-size:clamp(35px,7vw,62px);line-height:1.02;letter-spacing:-.06em;margin:
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}.activity{position:relative;text-align:left;border:1px solid var(--line);border-radius:22px;padding:18px;background:#fff;box-shadow:0 7px 22px rgba(38,61,53,.055);min-height:185px;color:var(--ink);display:flex;flex-direction:column;align-items:flex-start;gap:8px;transition:transform .16s ease}.activity:hover{transform:translateY(-3px)}.activity .emoji{width:52px;height:52px;border-radius:17px;display:grid;place-items:center;background:#fff2d8;font-size:29px}.activity:nth-child(2) .emoji{background:#e9f5ff}.activity:nth-child(3) .emoji{background:#f4eefe}.activity:nth-child(4) .emoji{background:#e8f8ee}.activity:nth-child(5) .emoji{background:#ffe9e6}.activity:nth-child(6) .emoji{background:#e9f5f3}.activity strong{font-size:16px}.activity small{color:var(--muted);line-height:1.4;font-size:12px}.tag{margin-top:auto;padding:6px 9px;border-radius:20px;background:#f2f6f0;color:#5c7868;font-size:10px;font-weight:900}
 .note{border:1px solid #e6eee5;border-radius:20px;background:#ffffffb8;padding:18px;margin-top:25px}.note h3{margin:0 0 8px;font-size:16px}.note p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}.principle{padding:13px;border-radius:15px;background:#f8faf5}.principle b{display:block;font-size:12px}.principle span{display:block;color:var(--muted);font-size:11px;line-height:1.45;margin-top:5px}
 .premium{margin-top:25px;border-radius:24px;padding:22px;background:#263d35;color:#fff;display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}.premium h2{margin:0 0 7px;font-size:22px}.premium p{margin:0;color:#d2e1d8;font-size:12px;line-height:1.55}.price{font-size:26px;font-weight:950;white-space:nowrap}.price small{font-size:11px;font-weight:700;color:#c7d9cf}.disabled{border:0;border-radius:14px;background:#d6e4dc;color:#304a3e;padding:12px 15px;font-weight:900;grid-column:1/-1;cursor:not-allowed;opacity:.95}
+.plans{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.plan{border:1px solid #6b8175;border-radius:18px;padding:17px;background:#314b40;display:flex;flex-direction:column;gap:9px}
+.plan.featured{border:2px solid #ffd66b;background:#385447}
+.plan-label{font-size:10px;font-weight:950;letter-spacing:.08em;color:#d2e1d8}
+.plan-price{font-size:clamp(25px,5vw,34px);font-weight:950;white-space:nowrap}
+.plan-price small{font-size:11px;font-weight:700;color:#d2e1d8}
+.plan p{font-size:12px;line-height:1.5;color:#d2e1d8;margin:0 0 5px}
+.plan .disabled{margin-top:auto;grid-column:auto}
+@media(max-width:560px){.plans{grid-template-columns:1fr}}
+
 footer{text-align:center;color:#829087;font-size:11px;margin-top:23px}
 #game{display:none;position:fixed;inset:0;z-index:20;background:#f7f8f1;overflow:auto;padding:18px}.game-shell{width:min(720px,100%);margin:0 auto;padding:18px 0 45px}.game-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.game-top button{border:1px solid var(--line);background:#fff;border-radius:13px;padding:10px 13px;font-weight:850}.game-progress{height:8px;background:#e5ece3;border-radius:20px;overflow:hidden;margin:17px 0 25px}.game-progress span{display:block;height:100%;width:0;background:var(--mint);transition:width .2s}
 .game-panel{border:1px solid var(--line);background:#fff;border-radius:26px;padding:clamp(18px,5vw,30px);box-shadow:var(--shadow);text-align:center}.game-panel .prompt{font-size:clamp(21px,5vw,30px);font-weight:950;letter-spacing:-.04em;margin:7px 0 12px}.game-panel .hint{color:var(--muted);font-size:13px;line-height:1.5}.visual{font-size:clamp(45px,12vw,78px);line-height:1.5;margin:15px 0;word-break:break-word}.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:20px}.option{min-height:76px;border:2px solid var(--line);border-radius:18px;background:#fbfdf9;padding:12px;font-size:20px;font-weight:900;color:var(--ink)}.option:active{transform:scale(.98)}.option.good{border-color:#59bfa5;background:#edfbf4}.option.bad{border-color:#ed8d83;background:#fff2ef}.feedback{min-height:28px;margin-top:16px;font-weight:850;color:#39866d}.next{display:none;margin-top:12px;border:0;border-radius:15px;background:var(--coral);color:white;padding:14px 22px;font-weight:900}.result{font-size:64px;margin:12px}.memory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}.memory-card{height:90px;border:2px solid var(--line);border-radius:17px;background:#f2f7f1;font-size:30px}.memory-card.open,.memory-card.matched{background:#effbf5;border-color:#59bfa5}.memory-card.matched{opacity:.55}
@@ -71,10 +81,22 @@ footer{text-align:center;color:#829087;font-size:11px;margin-top:23px}
  </div>
 </section>
 <section class="premium">
- <div><h2>🔒 Akses penuh GkiD Advance</h2><p>Pelan langganan bulanan dirancang melalui Google Play. Pembelian, pemulihan langganan dan pengesahan akses akan diaktifkan selepas aplikasi Android serta akaun Play Console disediakan.</p></div>
- <div class="price">RM19.90 <small>/ bulan*</small></div>
- <button class="disabled" disabled aria-disabled="true">Langganan Google Play belum tersedia</button>
- <p style="grid-column:1/-1;font-size:10px;color:#c7d9cf">*Harga cadangan sahaja. Tiada bayaran atau langganan sebenar dibuat pada halaman ini. Aktiviti di atas ialah pratonton.</p>
+ <div style="grid-column:1/-1"><h2>🔒 Pilih pelan GkiD Advance</h2><p>GkiD Basic kekal percuma. Pilih pelan Advance yang sesuai apabila pembayaran rasmi sudah tersedia.</p></div>
+ <div class="plans">
+  <div class="plan">
+   <span class="plan-label">BULANAN</span>
+   <div class="plan-price">RM4.99 <small>/ bulan</small></div>
+   <p>Bayaran bulanan. Akses diperbaharui selepas pembayaran setiap bulan disahkan.</p>
+   <button class="disabled" disabled aria-disabled="true">FPX belum tersedia</button>
+  </div>
+  <div class="plan featured">
+   <span class="plan-label">SEKALI BAYAR</span>
+   <div class="plan-price">RM29.99 <small>/ sekali</small></div>
+   <p>Bayar sekali untuk akses GkiD Advance seumur hidup, tertakluk pada terma perkhidmatan.</p>
+   <button class="disabled" disabled aria-disabled="true">FPX belum tersedia</button>
+  </div>
+ </div>
+ <p style="grid-column:1/-1;font-size:10px;color:#c7d9cf">Harga cadangan. Tiada transaksi atau langganan sebenar dibuat di halaman ini. Integrasi FPX, pengesahan pembayaran dan pengurusan akses belum diaktifkan. Urusan akaun pembayaran perlu dikendalikan oleh penjaga dewasa.</p>
 </section>
 <footer>GkiD Advance • Pratonton pembelajaran • Kemajuan contoh disimpan pada peranti ini sahaja.</footer>
 </div>
