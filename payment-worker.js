@@ -43,7 +43,7 @@ async function toyPost(base, path, fields) {
 }
 
 async function verifyWithToyyibPay(env, order) {
-  const rows = await toyPost("https://toyyibpay.com", "/index.php/api/getBillTransactions", {
+  const rows = await toyPost(env.TOYYIBPAY_BASE || "https://toyyibpay.com", "/index.php/api/getBillTransactions", {
     billCode: order.billCode,
     userSecretKey: env.TOYYIBPAY_SECRET,
     billpaymentStatus: "1"
@@ -70,7 +70,7 @@ async function handleCreate(request, env, origin) {
     "/advance.html?payment=return&order_id=" + encodeURIComponent(orderId);
   const callbackUrl = new URL("/api/toyyibpay-callback", request.url).toString();
 
-  const result = await toyPost("https://toyyibpay.com", "/index.php/api/createBill", {
+  const result = await toyPost(env.TOYYIBPAY_BASE || "https://toyyibpay.com", "/index.php/api/createBill", {
     userSecretKey: env.TOYYIBPAY_SECRET,
     categoryCode: env.TOYYIBPAY_CATEGORY,
     billName: plan.name,
