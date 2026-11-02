@@ -1935,21 +1935,20 @@ function mathQuestion(content, level) {
     // Tahap 3: kira objek yang sama, dengan arahan khusus ikut gambar.
     const target = Math.floor(Math.random() * 6) + 5;
     const objects = [
-      { icon: '🐟', name: 'ikan', plural: 'ikan' },
-      { icon: '🍼', name: 'botol', plural: 'botol' },
-      { icon: '⭐', name: 'bintang', plural: 'bintang' },
-      { icon: '🍎', name: 'epal', plural: 'epal' },
-      { icon: '🦋', name: 'rama-rama', plural: 'rama-rama' }
+      { icon: '🐟', name: 'ikan', prompt: 'Cuba kira ikan. Ada berapa ekor ikan?', answer: 'ekor ikan' },
+      { icon: '🍼', name: 'botol', prompt: 'Cuba kira botol. Ada berapa botol?', answer: 'botol' },
+      { icon: '🍎', name: 'epal', prompt: 'Cuba kira epal. Ada berapa biji epal?', answer: 'biji epal' },
+      { icon: '⚽', name: 'bola', prompt: 'Cuba kira bola. Ada berapa biji bola?', answer: 'biji bola' },
+      { icon: '🧸', name: 'anak patung', prompt: 'Cuba kira anak patung. Ada berapa buah anak patung?', answer: 'buah anak patung' }
     ];
     const object = sample(objects);
-    const prompt = 'Cuba kira, ada berapa ' + object.plural + '?';
-    title(content, prompt);
+    title(content, object.prompt);
     visual(content, Array(target).fill(object.icon).join(' '));
     const options = shuffle([target, ...shuffle(Array.from({length: 10}, (_, i) => i + 1).filter(n => n !== target)).slice(0, 2)]);
     cardGrid(content, options.map(n => ({ icon: String(n), label: 'Pilih jawapan' })), (item, card) => {
-      answer(String(target), item.icon, card, 'Bagus! Ada ' + target + ' ' + object.plural + '.');
+      answer(String(target), item.icon, card, 'Bagus! Ada ' + target + ' ' + object.answer + '.');
     });
-    state.instruction = prompt;
+    state.instruction = object.prompt;
   }
   speak(state.instruction);
 }
