@@ -417,6 +417,10 @@ body {
 .level-count { color: #71847a; font-size: 11px; font-weight: 750; }
 .level-complete { border-color: #6bc6a6; background: linear-gradient(160deg,#fff,#f1fff7); }
 .top .round { border: 1px solid var(--line); box-shadow: 0 6px 18px rgba(35,59,49,.12); }
+.screen-back { position:fixed; z-index:120; top:10px; left:12px; display:inline-flex; align-items:center; gap:7px; min-height:46px; padding:0 15px; border:1px solid #e3ebe2; border-radius:24px; background:#fff; color:#29463a; box-shadow:0 6px 18px rgba(35,59,49,.12); font-size:15px; font-weight:900; }
+.screen-back[hidden] { display:none !important; }
+.screen-back:active { transform:scale(.97); }
+@media(max-width:390px){ .screen-back { min-height:43px; padding:0 12px; font-size:14px; } }
 .counter { background: white; border: 1px solid var(--line); color: #b87a10; box-shadow: 0 6px 18px rgba(35,59,49,.08); }
 #activityContent { max-width: 760px; background: rgba(255,255,255,.74); border: 1px solid rgba(227,235,226,.8); border-radius: 28px; padding: clamp(16px,4vw,30px); box-shadow: var(--shadow-soft); }
 #activityContent > h2 { margin-top: 2px; }
@@ -608,6 +612,8 @@ body {
 
 <body>
 <div id="app">
+
+  <button type="button" id="screenBack" class="screen-back" aria-label="Kembali" onclick="navigateBack()" hidden>← <span>Kembali</span></button>
 
   <div class="top" id="topBar" hidden>
     <div class="counter" id="progressCounter">⭐ 0</div>
@@ -995,7 +1001,7 @@ const WORLDS = {
   count:   { icon: '🔢', name: 'Kira Objek' },
   compare: { icon: '⚖️', name: 'Banding Saiz' },
   word:    { icon: '📖', name: 'Baca & Eja' },
-  abc:     { icon: '🔤', name: 'Kenal ABC' },
+  abc:     { icon: '🔤', name: 'Di Mana Huruf?' },
   emotion: { icon: '😊', name: 'Dunia Emosi' },
   pattern: { icon: '🧩', name: 'Corak & Bentuk' }
 };
@@ -1109,10 +1115,38 @@ function showScreen(id, renderParentSettings = true) {
   if (target) target.classList.add('active');
 
   document.getElementById('topBar').hidden = id !== 'activity';
+  const backButton = document.getElementById('screenBack');
+  if (backButton) backButton.hidden = id === 'home';
 
   if (id === 'worlds') renderWorlds();
   if (id === 'parent' && renderParentSettings) renderParent();
 }
+
+function navigateBack() {
+  const active = document.querySelector('.screen.active');
+  const id = active ? active.id : 'home';
+  stopVoice();
+  if (id === 'activity') {
+    showScreen('levels');
+  } else if (id === 'levels') {
+    showScreen('worlds');
+  } else if (id === 'worlds') {
+    showScreen('ages');
+  } else if (id === 'ages' || id === 'parent') {
+    showScreen('home');
+  } else {
+    showScreen('home');
+  }
+}
+
+// Kekalkan navigasi dalam aplikasi apabila pengguna menekan butang Back Android/pelayar.
+window.addEventListener('load', () => {
+  try { history.pushState({ gkid: true }, '', location.href); } catch {}
+});
+window.addEventListener('popstate', () => {
+  navigateBack();
+  try { history.pushState({ gkid: true }, '', location.href); } catch {}
+});
 
 function updateCounter() {
   const counter = document.getElementById('progressCounter');
@@ -1190,7 +1224,7 @@ function renderWorlds() {
     count: 'Kira objek satu demi satu.',
     compare: 'Banding banyak, sedikit dan saiz.',
     word: 'Kenal perkataan dan mula mengeja.',
-    abc: 'Teroka huruf A hingga Z.',
+    abc: 'Cari dan kenal pasti huruf A hingga Z.',
     emotion: 'Kenal dan fahami perasaan.',
     pattern: 'Cari corak dan bentuk yang sama.'
   };
@@ -1774,7 +1808,7 @@ function abcQuestion(content, level) {
   if (level === 1) {
     target = sample(ABC);
 
-    title(content, 'Cari huruf yang sama.');
+    title(content, 'Di mana huruf ' + target.letter + '?');
 
     const big = document.createElement('div');
     big.className = 'big-letter';
@@ -1792,7 +1826,7 @@ function abcQuestion(content, level) {
   } else if (level === 2) {
     target = sample(ABC);
 
-    title(content, 'Cari huruf pertama bagi ' + target.name + '.');
+    title(content, 'Di mana huruf pertama bagi ' + target.name + '?');
     visual(content, target.icon);
 
     cardGrid(content, choices(target, ABC).map(x => ({
@@ -1806,7 +1840,7 @@ function abcQuestion(content, level) {
   } else {
     target = sample(ABC);
 
-    title(content, 'Padankan huruf dengan gambar.');
+    title(content, 'Cari gambar yang bermula dengan huruf ' + target.letter + '.');
 
     cardGrid(content, choices(target, ABC).map(x => ({
       ...x,
