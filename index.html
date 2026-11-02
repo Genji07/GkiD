@@ -1911,38 +1911,45 @@ function emotionQuestion(content, level) {
 
 function mathQuestion(content, level) {
   if (level === 1) {
-    // Tahap 1: kenal nombor kecil dan turutan 1, 2, 3.
+    // Tahap 1: kenal nombor 1 hingga 3.
     const target = Math.floor(Math.random() * 3) + 1;
-    title(content, 'Kenal nombor ' + target + '. Sentuh nombor yang betul.');
+    title(content, 'Cuba cari nombor ' + target + '.');
     visual(content, String(target));
     const options = shuffle([target, ...shuffle([1, 2, 3, 4].filter(n => n !== target)).slice(0, 2)]);
     cardGrid(content, options.map(n => ({ icon: String(n), label: 'Nombor' })), (item, card) => {
-      answer(String(target), item.icon, card, 'Betul! Ini nombor ' + target + '.');
+      answer(String(target), item.icon, card, 'Bagus! Ini nombor ' + target + '.');
     });
-    state.instruction = 'Cari nombor ' + target + '.';
+    state.instruction = 'Cuba cari nombor ' + target + '.';
   } else if (level === 2) {
     // Tahap 2: cari nombor yang datang selepas turutan.
-    const target = Math.floor(Math.random() * 4) + 2; // 2 hingga 5
+    const target = Math.floor(Math.random() * 4) + 2;
     const sequence = Array.from({ length: target - 1 }, (_, i) => i + 1);
-    title(content, 'Nombor apa datang selepas ini?');
+    title(content, 'Nombor apa yang datang selepas ini?');
     visual(content, sequence.join('   ') + '   ?');
     const options = shuffle([target, ...shuffle([1, 2, 3, 4, 5, 6].filter(n => n !== target)).slice(0, 2)]);
     cardGrid(content, options.map(n => ({ icon: String(n), label: 'Nombor seterusnya' })), (item, card) => {
-      answer(String(target), item.icon, card, 'Bagus! Selepas ' + sequence[sequence.length - 1] + ', datang nombor ' + target + '.');
+      answer(String(target), item.icon, card, 'Bagus! Selepas ' + sequence[sequence.length - 1] + ', nombor seterusnya ialah ' + target + '.');
     });
-    state.instruction = 'Nombor apa datang selepas ' + sequence.join(', ') + '?';
+    state.instruction = 'Nombor apa yang datang selepas ' + sequence.join(', ') + '?';
   } else {
-    // Tahap 3: kira objek sehingga 10.
-    const target = Math.floor(Math.random() * 6) + 5; // 5 hingga 10
-    const objects = ['⭐', '🍎', '🐟', '🟠', '🦋'];
-    const icon = sample(objects);
-    title(content, 'Kira semua objek. Ada berapa?');
-    visual(content, Array(target).fill(icon).join(' '));
+    // Tahap 3: kira objek yang sama, dengan arahan khusus ikut gambar.
+    const target = Math.floor(Math.random() * 6) + 5;
+    const objects = [
+      { icon: '🐟', name: 'ikan', plural: 'ikan' },
+      { icon: '🍼', name: 'botol', plural: 'botol' },
+      { icon: '⭐', name: 'bintang', plural: 'bintang' },
+      { icon: '🍎', name: 'epal', plural: 'epal' },
+      { icon: '🦋', name: 'rama-rama', plural: 'rama-rama' }
+    ];
+    const object = sample(objects);
+    const prompt = 'Cuba kira, ada berapa ' + object.plural + '?';
+    title(content, prompt);
+    visual(content, Array(target).fill(object.icon).join(' '));
     const options = shuffle([target, ...shuffle(Array.from({length: 10}, (_, i) => i + 1).filter(n => n !== target)).slice(0, 2)]);
     cardGrid(content, options.map(n => ({ icon: String(n), label: 'Pilih jawapan' })), (item, card) => {
-      answer(String(target), item.icon, card, 'Betul! Ada ' + target + ' objek.');
+      answer(String(target), item.icon, card, 'Bagus! Ada ' + target + ' ' + object.plural + '.');
     });
-    state.instruction = 'Kira semua objek. Ada berapa?';
+    state.instruction = prompt;
   }
   speak(state.instruction);
 }
