@@ -640,7 +640,7 @@ body {
         <div class="hero-copy">
           <div class="eyebrow"><span class="eyebrow-dot"></span> Ruang kecil untuk ilmu besar</div>
           <h1>Jom belajar,<br><em>jom teroka!</em></h1>
-          <p class="hero-description">Permainan ceria untuk kenal haiwan, huruf, nombor, warna dan emosi — satu langkah kecil setiap hari.</p>
+          <p class="hero-description">Permainan ceria untuk teroka haiwan, cari huruf, kira nombor, kenal warna dan fahami emosi — satu langkah kecil setiap hari.</p>
           <div class="hero-actions">
             <button class="btn hero-start" onclick="showScreen('ages')"><span>Mula pengembaraan</span><span aria-hidden="true">➜</span></button>
             <button class="btn light parent-start" onclick="parentGate()">Untuk ibu bapa</button>
@@ -1796,7 +1796,7 @@ function wordQuestion(content, level) {
     content.appendChild(buttons);
   }
 
-  state.instruction = 'Belajar perkataan ' + word.word;
+  state.instruction = 'Cari perkataan ' + word.word + '.';
   speak(state.instruction);
 }
 
@@ -1852,7 +1852,7 @@ function abcQuestion(content, level) {
     });
   }
 
-  state.instruction = 'Belajar huruf ' + target.letter;
+  state.instruction = 'Di mana huruf ' + target.letter + '?';
   speak(state.instruction);
 }
 
