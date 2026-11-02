@@ -1015,7 +1015,7 @@ const WORLDS = {
   word:    { icon: '📖', name: 'Baca & Eja' },
   abc:     { icon: '🔤', name: 'Di Mana Huruf?' },
   emotion: { icon: '😊', name: 'Dunia Emosi' },
-  pattern: { icon: '🧩', name: 'Corak & Bentuk' }
+  pattern: { icon: '🔢', name: 'Belajar Matematik' }
 };
 
 const ANIMALS = [
@@ -1238,7 +1238,7 @@ function renderWorlds() {
     word: 'Kenal perkataan dan mula mengeja.',
     abc: 'Cari dan kenal pasti huruf A hingga Z.',
     emotion: 'Kenal dan fahami perasaan.',
-    pattern: 'Cari corak dan bentuk yang sama.'
+    pattern: 'Kenal nombor 1, 2, 3, cari nombor seterusnya dan mula mengira.'
   };
   const map = document.getElementById('adventureMap');
   const grid = document.getElementById('worldGrid');
@@ -1386,7 +1386,7 @@ function makeQuestion() {
   else if (key === 'word') wordQuestion(content, level);
   else if (key === 'abc') abcQuestion(content, level);
   else if (key === 'emotion') emotionQuestion(content, level);
-  else if (key === 'pattern') patternQuestion(content, level);
+  else if (key === 'pattern') mathQuestion(content, level);
 
   const hint = document.createElement('p');
   hint.id = 'feedback';
@@ -1907,63 +1907,43 @@ function emotionQuestion(content, level) {
   speak(state.instruction);
 }
 
-/* ---------------- WORLD 8: PATTERN ---------------- */
+/* ---------------- WORLD 8: EARLY MATHEMATICS ---------------- */
 
-function patternQuestion(content, level) {
+function mathQuestion(content, level) {
   if (level === 1) {
-    const a = sample(COLORS);
-    let b = sample(COLORS);
-
-    while (b === a) b = sample(COLORS);
-
-    title(content, 'Apa warna yang seterusnya?');
-    visual(content, [a.icon, b.icon, a.icon, b.icon, a.icon].join(' '));
-
-    cardGrid(content, choices(b, COLORS), (item, card) => {
-      answer(b, item, card, 'Betul! Corak berselang-seli.');
+    // Tahap 1: kenal nombor kecil dan turutan 1, 2, 3.
+    const target = Math.floor(Math.random() * 3) + 1;
+    title(content, 'Kenal nombor ' + target + '. Sentuh nombor yang betul.');
+    visual(content, String(target));
+    const options = shuffle([target, ...shuffle([1, 2, 3, 4].filter(n => n !== target)).slice(0, 2)]);
+    cardGrid(content, options.map(n => ({ icon: String(n), label: 'Nombor' })), (item, card) => {
+      answer(String(target), item.icon, card, 'Betul! Ini nombor ' + target + '.');
     });
-
-    state.instruction = 'Apa warna yang seterusnya?';
+    state.instruction = 'Cari nombor ' + target + '.';
   } else if (level === 2) {
-    const a = sample(SHAPES);
-    let b = sample(SHAPES);
-
-    while (a === b) b = sample(SHAPES);
-
-    title(content, 'Cari bentuk yang berbeza.');
-
-    const items = shuffle([
-      { icon: a.icon, name: 'Bentuk biasa' },
-      { icon: a.icon, name: 'Bentuk biasa' },
-      { icon: a.icon, name: 'Bentuk biasa' },
-      { icon: b.icon, name: 'Bentuk berbeza' }
-    ]);
-
-    cardGrid(content, items.map((x, i) => ({
-      ...x,
-      id: i
-    })), (item, card) => {
-      const correct = item.icon === b.icon;
-      if (correct) answer(item, item, card, 'Bagus! Kamu jumpa bentuk berbeza.');
-      else {
-        card.classList.add('wrong');
-        setTimeout(() => card.classList.remove('wrong'), 400);
-        speak('Cuba lagi.');
-      }
+    // Tahap 2: cari nombor yang datang selepas turutan.
+    const target = Math.floor(Math.random() * 4) + 2; // 2 hingga 5
+    const sequence = Array.from({ length: target - 1 }, (_, i) => i + 1);
+    title(content, 'Nombor apa datang selepas ini?');
+    visual(content, sequence.join('   ') + '   ?');
+    const options = shuffle([target, ...shuffle([1, 2, 3, 4, 5, 6].filter(n => n !== target)).slice(0, 2)]);
+    cardGrid(content, options.map(n => ({ icon: String(n), label: 'Nombor seterusnya' })), (item, card) => {
+      answer(String(target), item.icon, card, 'Bagus! Selepas ' + sequence[sequence.length - 1] + ', datang nombor ' + target + '.');
     });
-    state.instruction = 'Cari bentuk yang berbeza.';
+    state.instruction = 'Nombor apa datang selepas ' + sequence.join(', ') + '?';
   } else {
-    const target = sample(SHAPES);
-
-    title(content, 'Cari bentuk ' + target.name.toLowerCase() + '.');
-
-    cardGrid(content, choices(target, SHAPES), (item, card) => {
-      answer(target, item, card, 'Betul! ' + target.name);
+    // Tahap 3: kira objek sehingga 10.
+    const target = Math.floor(Math.random() * 6) + 5; // 5 hingga 10
+    const objects = ['⭐', '🍎', '🐟', '🟠', '🦋'];
+    const icon = sample(objects);
+    title(content, 'Kira semua objek. Ada berapa?');
+    visual(content, Array(target).fill(icon).join(' '));
+    const options = shuffle([target, ...shuffle(Array.from({length: 10}, (_, i) => i + 1).filter(n => n !== target)).slice(0, 2)]);
+    cardGrid(content, options.map(n => ({ icon: String(n), label: 'Pilih jawapan' })), (item, card) => {
+      answer(String(target), item.icon, card, 'Betul! Ada ' + target + ' objek.');
     });
-
-    state.instruction = 'Cari bentuk ' + target.name;
+    state.instruction = 'Kira semua objek. Ada berapa?';
   }
-
   speak(state.instruction);
 }
 
