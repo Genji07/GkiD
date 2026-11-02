@@ -425,6 +425,18 @@ body {
 #activityContent { max-width: 760px; background: rgba(255,255,255,.74); border: 1px solid rgba(227,235,226,.8); border-radius: 28px; padding: clamp(16px,4vw,30px); box-shadow: var(--shadow-soft); }
 #activityContent > h2 { margin-top: 2px; }
 #activityContent .grid { margin-top: 20px; }
+#activityContent .word-choice-card .pic {
+  white-space: nowrap;
+  word-break: keep-all;
+  overflow-wrap: normal;
+  font-size: clamp(25px, 7vw, 42px);
+  line-height: 1.15;
+}
+#activityContent .word-choice-card {
+  min-width: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
 .reward { background: rgba(247,248,241,.97); backdrop-filter: blur(12px); }
 .reward-pic { filter: drop-shadow(0 12px 14px rgba(60,90,70,.12)); }
 .setting { border: 1px solid var(--line); box-shadow: 0 6px 20px rgba(35,59,49,.04); border-radius: 18px; }
@@ -1715,12 +1727,16 @@ function wordQuestion(content, level) {
   if (level === 1) {
     title(content, 'Pilih perkataan yang betul.');
 
-    cardGrid(content, choices(word, WORDS).map(w => ({
+    const wordGrid = cardGrid(content, choices(word, WORDS).map(w => ({
       ...w,
       icon: w.word,
       label: 'Perkataan'
     })), (item, card) => {
       answer(word, item, card, 'Betul! ' + word.word);
+    });
+    wordGrid.classList.add('word-choice-grid');
+    wordGrid.querySelectorAll('.card').forEach(card => {
+      card.classList.add('word-choice-card');
     });
   } else if (level === 2) {
     title(content, 'Apakah huruf pertama bagi ' + word.word + '?');
